@@ -1,0 +1,127 @@
+"use strict";(self.webpackChunkfrontend=self.webpackChunkfrontend||[]).push([[804],{"./src/modules/features/document/SourceRecording/index.stories.tsx"(__unused_webpack_module,__webpack_exports__,__webpack_require__){__webpack_require__.r(__webpack_exports__);var _api_fetch_api_v1_workspaces_workspaceId_recordings_recordingId_document__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__("./src/shared/api/fetch/api/v1/workspaces/[workspaceId]/recordings/[recordingId]/document/index.ts"),_api_mock_responses_document__WEBPACK_IMPORTED_MODULE_1__=__webpack_require__("./src/shared/api/mock/responses/document.ts"),msw__WEBPACK_IMPORTED_MODULE_2__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/msw@2.15.0_@types+node@26.1.2_typescript@7.0.2/node_modules/msw/lib/core/http.mjs"),msw__WEBPACK_IMPORTED_MODULE_3__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/msw@2.15.0_@types+node@26.1.2_typescript@7.0.2/node_modules/msw/lib/core/HttpResponse.mjs"),msw__WEBPACK_IMPORTED_MODULE_4__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/msw@2.15.0_@types+node@26.1.2_typescript@7.0.2/node_modules/msw/lib/core/delay.mjs"),react_router__WEBPACK_IMPORTED_MODULE_5__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/react-router@8.3.0_react-dom@19.2.8_react@19.2.8__react@19.2.8/node_modules/react-router/dist/production/lib/components.js"),storybook_test__WEBPACK_IMPORTED_MODULE_6__=__webpack_require__("storybook/test"),___WEBPACK_IMPORTED_MODULE_7__=__webpack_require__("./src/modules/features/document/SourceRecording/index.tsx"),_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/@emotion+react@11.14.0_@types+react@19.2.18_react@19.2.8_supports-color@10.2.2/node_modules/@emotion/react/jsx-runtime/dist/emotion-react-jsx-runtime.browser.esm.js");const RECORDING_ID=_api_mock_responses_document__WEBPACK_IMPORTED_MODULE_1__.b9[0].recordingSessionId,RECORDING_DOCUMENT_REQUEST=`*${(0,_api_fetch_api_v1_workspaces_workspaceId_recordings_recordingId_document__WEBPACK_IMPORTED_MODULE_0__.R)(1,RECORDING_ID)}`,ISOLATED_DOCS={story:{inline:!1,iframeHeight:200}},__WEBPACK_DEFAULT_EXPORT__={title:"Document/SourceRecording",component:___WEBPACK_IMPORTED_MODULE_7__.A,args:{workspaceId:1,recordingId:RECORDING_ID},parameters:{design:[{name:"문서/확인한 사람 보기",type:"figma",url:"https://www.figma.com/design/jyDFCKX5AIztZessq4H7nQ/knot?node-id=1535-2817"},{name:"Card/RelatedDoc 녹음 · 불러오는 중 · 제목 못 불러옴",type:"figma",url:"https://www.figma.com/design/jyDFCKX5AIztZessq4H7nQ/knot?node-id=5374-1752"}],docs:{description:{component:"문서 보기의 「이 문서가 나온 녹음」이에요. 문서 본문 아래, 확인 버튼 줄 위에 놓여 이 문서를 만든 녹음을 카드 하나로 보여 줘요.\n카드를 누르면 그 녹음의 녹음 문서(회의 전체 요약, 원문, 녹음 음성)로 가요.\n\n**동작 규칙**\n- 카드는 녹음 문서의 「이 회의에서 나온 문서」 카드와 같은 모양이에요. 문서와 녹음 사이를 양쪽으로 오가는 길이 같은 모양으로 보이게 했어요.\n- 녹음 제목은 녹음 문서와 같은 제목이에요. AI 제목이 없는 녹음은 서버가 「OO 님의 녹음」으로 채워 줘요.\n- 녹음 제목을 받는 동안은 제목 자리만 회색으로 채워요. 받지 못하면 「녹음 보기」로 보여 줘요. 어느 때든 누르면 녹음 문서로 가요.\n- 녹음 직후 문서 화면을 포함해 어느 입구로 연 문서 보기에서나 같아요.\n- 넓은 화면에서는 「이 회의에서 나온 문서」의 두 열 중 한 칸 폭이고, 좁은 화면에서는 본문 폭을 채워요."}}},decorators:[Story=>(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.Y)(react_router__WEBPACK_IMPORTED_MODULE_5__.fS,{children:(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.Y)("div",{style:{maxWidth:"45rem"},children:(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.Y)(Story,{})})})]},Default={},UnsupportedApi={parameters:{docs:{story:{inline:!1,iframeHeight:300}},msw:{handlers:{sourceRecording:msw__WEBPACK_IMPORTED_MODULE_2__.L.get(RECORDING_DOCUMENT_REQUEST,()=>msw__WEBPACK_IMPORTED_MODULE_3__.cS.json({code:"REQUEST_PATH_NOT_FOUND"},{status:404}))}}}},Loading={parameters:{msw:{handlers:[msw__WEBPACK_IMPORTED_MODULE_2__.L.get(RECORDING_DOCUMENT_REQUEST,async()=>(await(0,msw__WEBPACK_IMPORTED_MODULE_4__.cb)("infinite"),new msw__WEBPACK_IMPORTED_MODULE_3__.cS(null,{status:500})))]},docs:ISOLATED_DOCS}},TitleLoadFailed={parameters:{msw:{handlers:[msw__WEBPACK_IMPORTED_MODULE_2__.L.get(RECORDING_DOCUMENT_REQUEST,()=>new msw__WEBPACK_IMPORTED_MODULE_3__.cS(null,{status:500}))]},docs:ISOLATED_DOCS}};let supportCheckCount=0;const UnsupportedRetryFailed={beforeEach:()=>{supportCheckCount=0},parameters:{docs:{story:{inline:!1,iframeHeight:300}},msw:{handlers:{sourceRecording:msw__WEBPACK_IMPORTED_MODULE_2__.L.get(RECORDING_DOCUMENT_REQUEST,()=>(supportCheckCount+=1,1===supportCheckCount?msw__WEBPACK_IMPORTED_MODULE_3__.cS.json({code:"REQUEST_PATH_NOT_FOUND"},{status:404}):new msw__WEBPACK_IMPORTED_MODULE_3__.cS(null,{status:500})))}}},play:async({canvasElement})=>{const canvas=(0,storybook_test__WEBPACK_IMPORTED_MODULE_6__.within)(canvasElement);await storybook_test__WEBPACK_IMPORTED_MODULE_6__.userEvent.click(await canvas.findByRole("button",{name:"다시 확인"})),await(0,storybook_test__WEBPACK_IMPORTED_MODULE_6__.expect)(await canvas.findByRole("alert")).toHaveTextContent("녹음을 불러오지 못했어요")}};Default.parameters={...Default.parameters,docs:{...Default.parameters?.docs,source:{originalSource:"{}",...Default.parameters?.docs?.source},description:{story:"녹음 제목을 받은 기본 모양이에요",...Default.parameters?.docs?.description}}},UnsupportedApi.parameters={...UnsupportedApi.parameters,docs:{...UnsupportedApi.parameters?.docs,source:{originalSource:'{\n  parameters: {\n    docs: {\n      story: {\n        inline: false,\n        iframeHeight: 300\n      }\n    },\n    msw: {\n      handlers: {\n        sourceRecording: http.get(RECORDING_DOCUMENT_REQUEST, () => HttpResponse.json({\n          code: "REQUEST_PATH_NOT_FOUND"\n        }, {\n          status: 404\n        }))\n      }\n    }\n  }\n}',...UnsupportedApi.parameters?.docs?.source},description:{story:"녹음 문서 API가 미지원이면 출처 카드만 준비 안내로 바꿔요. 기존 문서 본문과 확인·복사는 유지돼요.",...UnsupportedApi.parameters?.docs?.description}}},Loading.parameters={...Loading.parameters,docs:{...Loading.parameters?.docs,source:{originalSource:'{\n  parameters: {\n    msw: {\n      handlers: [http.get(RECORDING_DOCUMENT_REQUEST, async () => {\n        await delay("infinite");\n        return new HttpResponse(null, {\n          status: 500\n        });\n      })]\n    },\n    docs: ISOLATED_DOCS\n  }\n}',...Loading.parameters?.docs?.source},description:{story:"녹음 제목을 받는 동안이에요. 제목 자리만 회색이고, 눌러도 녹음 문서로 가요",...Loading.parameters?.docs?.description}}},TitleLoadFailed.parameters={...TitleLoadFailed.parameters,docs:{...TitleLoadFailed.parameters?.docs,source:{originalSource:"{\n  parameters: {\n    msw: {\n      handlers: [http.get(RECORDING_DOCUMENT_REQUEST, () => new HttpResponse(null, {\n        status: 500\n      }))]\n    },\n    docs: ISOLATED_DOCS\n  }\n}",...TitleLoadFailed.parameters?.docs?.source},description:{story:"녹음 제목을 받지 못했을 때예요. 「녹음 보기」로 보여 주고, 눌러도 녹음 문서로 가요",...TitleLoadFailed.parameters?.docs?.description}}},UnsupportedRetryFailed.parameters={...UnsupportedRetryFailed.parameters,docs:{...UnsupportedRetryFailed.parameters?.docs,source:{originalSource:'{\n  beforeEach: () => {\n    supportCheckCount = 0;\n  },\n  parameters: {\n    docs: {\n      story: {\n        inline: false,\n        iframeHeight: 300\n      }\n    },\n    msw: {\n      handlers: {\n        sourceRecording: http.get(RECORDING_DOCUMENT_REQUEST, () => {\n          supportCheckCount += 1;\n          return supportCheckCount === 1 ? HttpResponse.json({\n            code: "REQUEST_PATH_NOT_FOUND"\n          }, {\n            status: 404\n          }) : new HttpResponse(null, {\n            status: 500\n          });\n        })\n      }\n    }\n  },\n  play: async ({\n    canvasElement\n  }) => {\n    const canvas = within(canvasElement);\n    await userEvent.click(await canvas.findByRole("button", {\n      name: "다시 확인"\n    }));\n    await expect(await canvas.findByRole("alert")).toHaveTextContent("녹음을 불러오지 못했어요");\n  }\n}',...UnsupportedRetryFailed.parameters?.docs?.source},description:{story:"미지원 안내에서 다시 확인했지만 서버 오류가 났을 때예요. 새 조회가 성공하기 전까지 출처 이동을 제한해요.",...UnsupportedRetryFailed.parameters?.docs?.description}}},__webpack_require__.d(__webpack_exports__,["Default",0,Default,"Loading",0,Loading,"TitleLoadFailed",0,TitleLoadFailed,"UnsupportedApi",0,UnsupportedApi,"UnsupportedRetryFailed",0,UnsupportedRetryFailed,"__namedExportsOrder",0,["Default","UnsupportedApi","Loading","TitleLoadFailed","UnsupportedRetryFailed"],"default",0,__WEBPACK_DEFAULT_EXPORT__])},"./src/assets/icons/alert.svg"(__unused_webpack_module,__webpack_exports__,__webpack_require__){var _path,react__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/react@19.2.8/node_modules/react/index.js"),_excluded=["size"];function _extends(){return _extends=Object.assign?Object.assign.bind():function(n){for(var e=1;e<arguments.length;e++){var t=arguments[e];for(var r in t)({}).hasOwnProperty.call(t,r)&&(n[r]=t[r])}return n},_extends.apply(null,arguments)}const __WEBPACK_DEFAULT_EXPORT__=function SvgAlert(_ref){var _ref$size=_ref.size,size=void 0===_ref$size?24:_ref$size,props=function _objectWithoutProperties(e,t){if(null==e)return{};var o,r,i=function _objectWithoutPropertiesLoose(r,e){if(null==r)return{};var t={};for(var n in r)if({}.hasOwnProperty.call(r,n)){if(-1!==e.indexOf(n))continue;t[n]=r[n]}return t}(e,t);if(Object.getOwnPropertySymbols){var n=Object.getOwnPropertySymbols(e);for(r=0;r<n.length;r++)o=n[r],-1===t.indexOf(o)&&{}.propertyIsEnumerable.call(e,o)&&(i[o]=e[o])}return i}(_ref,_excluded);return react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg",_extends({xmlns:"http://www.w3.org/2000/svg",fill:"none",viewBox:"0 0 18 18",width:size,height:size,focusable:"false","aria-hidden":"true"},props),_path||(_path=react__WEBPACK_IMPORTED_MODULE_0__.createElement("path",{stroke:"currentColor",strokeLinecap:"round",strokeLinejoin:"round",strokeWidth:1.6,d:"M9 5.5v4.2m0 2.8v.01M9 2c3.87 0 7 3.13 7 7s-3.13 7-7 7-7-3.13-7-7 3.13-7 7-7"})))};__webpack_require__.d(__webpack_exports__,["A",0,__WEBPACK_DEFAULT_EXPORT__])},"./src/shared/components/primitives/ui/Button/index.tsx"(__unused_webpack_module,__webpack_exports__,__webpack_require__){__webpack_require__.d(__webpack_exports__,{A:()=>Button});var _emotion_react__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/@emotion+react@11.14.0_@types+react@19.2.18_react@19.2.8_supports-color@10.2.2/node_modules/@emotion/react/dist/emotion-react.browser.esm.js"),_emotion_styled__WEBPACK_IMPORTED_MODULE_1__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/@emotion+styled@11.14.1_@emotion+react@11.14.0_@types+react@19.2.18_react@19.2.8_suppor_1e45ff7b04d06d3f2b60330d973b73ec/node_modules/@emotion/styled/dist/emotion-styled.browser.esm.js"),_shared_components_primitives_ui_Spinner__WEBPACK_IMPORTED_MODULE_2__=__webpack_require__("./src/shared/components/primitives/ui/Spinner/index.tsx"),_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/@emotion+react@11.14.0_@types+react@19.2.18_react@19.2.8_supports-color@10.2.2/node_modules/@emotion/react/jsx-runtime/dist/emotion-react-jsx-runtime.browser.esm.js");const BUTTON_SIZE={lg:{paddingX:"1.25rem",paddingY:"1rem",borderRadius:"0.875rem",gap:"0.5rem",iconSize:"1.5rem",spinnerSize:"1.5rem"},md:{paddingX:"1.125rem",paddingY:"0.75rem",borderRadius:"0.8125rem",gap:"0.4375rem",iconSize:"1.125rem",spinnerSize:"1.375rem"},sm:{paddingX:"1rem",paddingY:"0.5rem",borderRadius:"0.75rem",gap:"0.375rem",iconSize:"1rem",spinnerSize:"1.25rem"}};function Button({size="md",variant="filled",isLoading=!1,isFullWidth=!1,disabled=!1,type="button",children,...props}){const status=isLoading?"loading":disabled?"inactive":"active";return(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.FD)(Root,{type,disabled:disabled||isLoading,"aria-busy":isLoading,$size:size,$variant:variant,$status:status,$isFullWidth:isFullWidth,...props,children:[(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Y)(Content,{$isHidden:isLoading,$size:size,children}),isLoading&&(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Y)(SpinnerWrapper,{children:(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Y)(_shared_components_primitives_ui_Spinner__WEBPACK_IMPORTED_MODULE_2__.A,{size:BUTTON_SIZE[size].spinnerSize})})]})}const Root=_emotion_styled__WEBPACK_IMPORTED_MODULE_1__.A.button`
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  transition:
+    background-color 0.3s ease-in,
+    color 0.3s ease-in,
+    box-shadow 0.3s ease-in;
+
+  ${({theme})=>theme.text.label01};
+
+  width: ${({$isFullWidth})=>$isFullWidth?"100%":"auto"};
+  padding: ${({$size})=>`${BUTTON_SIZE[$size].paddingY} ${BUTTON_SIZE[$size].paddingX}`};
+  border-radius: ${({$size})=>BUTTON_SIZE[$size].borderRadius};
+
+  ${({theme,$variant,$status})=>(theme=>({filled:{active:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.primary};
+        color: ${theme.neutral[0]};
+      `,loading:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.primary};
+        color: ${theme.neutral[0]};
+      `,inactive:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.neutral[200]};
+        color: ${theme.neutral[400]};
+      `},outline:{active:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.neutral[0]};
+        color: ${theme.neutral[700]};
+        box-shadow: inset 0 0 0 1px ${theme.neutral[200]};
+      `,loading:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.neutral[0]};
+        color: ${theme.neutral[700]};
+        box-shadow: inset 0 0 0 1px ${theme.neutral[200]};
+      `,inactive:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.neutral[0]};
+        color: ${theme.neutral[400]};
+        box-shadow: inset 0 0 0 1px ${theme.neutral[200]};
+      `},accent:{active:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.sub.accent[100]};
+        color: ${theme.sub.accent[500]};
+      `,loading:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.sub.accent[100]};
+        color: ${theme.sub.accent[500]};
+      `,inactive:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.neutral[200]};
+        color: ${theme.neutral[400]};
+      `},danger:{active:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.sub.warning[600]};
+        color: ${theme.neutral[0]};
+      `,loading:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.sub.warning[600]};
+        color: ${theme.neutral[0]};
+      `,inactive:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.neutral[200]};
+        color: ${theme.neutral[400]};
+      `}}))(theme)[$variant][$status]};
+
+  /* 포커스 링 아웃라인 논의 필요 */
+  &:focus-visible {
+    outline: 2px solid ${({theme})=>theme.sub.accent[500]};
+    outline-offset: 2px;
+  }
+`,Content=_emotion_styled__WEBPACK_IMPORTED_MODULE_1__.A.span`
+  display: inline-flex;
+  align-items: center;
+  gap: ${({$size})=>BUTTON_SIZE[$size].gap};
+  opacity: ${({$isHidden})=>$isHidden?0:1};
+
+  & > svg {
+    flex-shrink: 0;
+    width: ${({$size})=>BUTTON_SIZE[$size].iconSize};
+    height: ${({$size})=>BUTTON_SIZE[$size].iconSize};
+  }
+`,SpinnerWrapper=_emotion_styled__WEBPACK_IMPORTED_MODULE_1__.A.span`
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;Button.__docgenInfo={description:"액션을 실행하는 버튼.",methods:[],displayName:"Button",props:{size:{required:!1,tsType:{name:"union",raw:'"lg" | "md" | "sm"',elements:[{name:"literal",value:'"lg"'},{name:"literal",value:'"md"'},{name:"literal",value:'"sm"'}]},description:"",defaultValue:{value:'"md"',computed:!1}},variant:{required:!1,tsType:{name:"union",raw:'"filled" | "outline" | "accent" | "danger"',elements:[{name:"literal",value:'"filled"'},{name:"literal",value:'"outline"'},{name:"literal",value:'"accent"'},{name:"literal",value:'"danger"'}]},description:"",defaultValue:{value:'"filled"',computed:!1}},isLoading:{required:!1,tsType:{name:"boolean"},description:"",defaultValue:{value:"false",computed:!1}},isFullWidth:{required:!1,tsType:{name:"boolean"},description:"",defaultValue:{value:"false",computed:!1}},disabled:{defaultValue:{value:"false",computed:!1},required:!1},type:{defaultValue:{value:'"button"',computed:!1},required:!1}},composes:["ButtonHTMLAttributes"]}},"./src/shared/components/primitives/ui/InlineError/index.tsx"(__unused_webpack_module,__webpack_exports__,__webpack_require__){__webpack_require__.d(__webpack_exports__,{A:()=>InlineError});var _emotion_styled__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/@emotion+styled@11.14.1_@emotion+react@11.14.0_@types+react@19.2.18_react@19.2.8_suppor_1e45ff7b04d06d3f2b60330d973b73ec/node_modules/@emotion/styled/dist/emotion-styled.browser.esm.js"),_primitives_ui_Button__WEBPACK_IMPORTED_MODULE_1__=__webpack_require__("./src/shared/components/primitives/ui/Button/index.tsx"),_assets_icons_alert_svg__WEBPACK_IMPORTED_MODULE_2__=__webpack_require__("./src/assets/icons/alert.svg"),_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/@emotion+react@11.14.0_@types+react@19.2.18_react@19.2.8_supports-color@10.2.2/node_modules/@emotion/react/jsx-runtime/dist/emotion-react-jsx-runtime.browser.esm.js");const ALIGN={start:"flex-start",center:"center"},SIZE={md:{iconSize:18,messageGap:"0.5rem",gap:"0.75rem"},sm:{iconSize:16,messageGap:"0.375rem",gap:"0.625rem"}};function InlineError({message,onRetry,isRetrying=!1,align="start",size="md"}){return(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.FD)(Container,{role:"alert",$align:align,$size:size,children:[(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.FD)(MessageRow,{$size:size,children:[(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Y)(Icon,{"aria-hidden":!0,size:SIZE[size].iconSize}),(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Y)(Message,{$size:size,children:message})]}),void 0!==onRetry&&("sm"===size?(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Y)(SmallRetryButton,{type:"button",disabled:isRetrying,onClick:onRetry,children:"다시 시도"}):(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Y)(_primitives_ui_Button__WEBPACK_IMPORTED_MODULE_1__.A,{size:"sm",variant:"outline",isLoading:isRetrying,onClick:onRetry,children:"다시 시도"}))]})}const Container=_emotion_styled__WEBPACK_IMPORTED_MODULE_0__.A.div`
+  display: flex;
+  flex-direction: column;
+  align-items: ${({$align})=>ALIGN[$align]};
+  gap: ${({$size})=>SIZE[$size].gap};
+`,MessageRow=_emotion_styled__WEBPACK_IMPORTED_MODULE_0__.A.div`
+  display: flex;
+  align-items: center;
+  gap: ${({$size})=>SIZE[$size].messageGap};
+`,Icon=(0,_emotion_styled__WEBPACK_IMPORTED_MODULE_0__.A)(_assets_icons_alert_svg__WEBPACK_IMPORTED_MODULE_2__.A)`
+  flex-shrink: 0;
+  color: ${({theme})=>theme.sub.warning[700]};
+`,Message=_emotion_styled__WEBPACK_IMPORTED_MODULE_0__.A.p`
+  ${({theme,$size})=>"sm"===$size?theme.text.caption02:theme.text.body01};
+  color: ${({theme})=>theme.neutral[700]};
+  overflow-wrap: break-word;
+`,SmallRetryButton=_emotion_styled__WEBPACK_IMPORTED_MODULE_0__.A.button`
+  ${({theme})=>theme.text.caption01};
+  padding: 0.375rem 0.75rem; /* 6px 12px */
+  border-radius: 62.4375rem; /* 999px */
+  background-color: ${({theme})=>theme.neutral[0]};
+  box-shadow: inset 0 0 0 1px ${({theme})=>theme.neutral[200]};
+  color: ${({theme})=>theme.neutral[700]};
+  white-space: nowrap;
+
+  &:focus-visible {
+    outline: 2px solid ${({theme})=>theme.sub.accent[500]};
+    outline-offset: 2px;
+  }
+`;InlineError.__docgenInfo={description:'화면 안 한 영역이나 한 동작만 실패했을 때, 그 내용이 있어야 할 자리에 남기는 안내.\n\n경고색은 아이콘에만 쓰고 문구는 본문 색이에요.\n같은 실패를 토스트로 또 알리지 않아요.\n낭독기가 바로 읽도록 `role="alert"`를 붙였어요.',methods:[],displayName:"InlineError",props:{message:{required:!0,tsType:{name:"string"},description:"무엇이 안 됐는지 알리는 문구"},onRetry:{required:!1,tsType:{name:"signature",type:"function",raw:"() => void",signature:{arguments:[],return:{name:"void"}}},description:"`다시 시도`를 눌렀을 때 실행할 동작. 다시 시도할 수 없는 실패면 넘기지 않고, 그때는 `다시 시도`를 그리지 않아요"},isRetrying:{required:!1,tsType:{name:"boolean"},description:"다시 시도 요청의 응답을 기다리는 중인지. 그동안 「다시 시도」를 누를 수 없고, 기본 크기에서는 버튼에 로딩을 그려요.\n@default false",defaultValue:{value:"false",computed:!1}},align:{required:!1,tsType:{name:"union",raw:"keyof typeof ALIGN",elements:[{name:"literal",value:"start"},{name:"literal",value:"center"}]},description:'문구와 `다시 시도`의 가로 정렬. 그 자리의 빈 상태 안내와 같은 정렬을 골라요.\n영역 전체를 대신할 때는 `center`(예: 홈 카드), 글 흐름 안에 들어갈 때는 `start`(예: 탐색 답변)예요.\n@default "start"',defaultValue:{value:'"start"',computed:!1}},size:{required:!1,tsType:{name:"union",raw:"keyof typeof SIZE",elements:[{name:"literal",value:"md"},{name:"literal",value:"sm"}]},description:'안내의 크기. 폭이 좁은 자리에는 `sm`을 골라요(예: 사이드바의 문서 목록).\n`sm`은 아이콘 · 문구 · `다시 시도`가 모두 한 단계 작아요.\n@default "md"',defaultValue:{value:'"md"',computed:!1}}}}},"./src/shared/components/primitives/ui/Spinner/index.tsx"(__unused_webpack_module,__webpack_exports__,__webpack_require__){__webpack_require__.d(__webpack_exports__,{A:()=>Spinner});var emotion_styled_browser_esm=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/@emotion+styled@11.14.1_@emotion+react@11.14.0_@types+react@19.2.18_react@19.2.8_suppor_1e45ff7b04d06d3f2b60330d973b73ec/node_modules/@emotion/styled/dist/emotion-styled.browser.esm.js"),emotion_react_browser_esm=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/@emotion+react@11.14.0_@types+react@19.2.18_react@19.2.8_supports-color@10.2.2/node_modules/@emotion/react/dist/emotion-react.browser.esm.js");const spinnerMaskurl_namespaceObject="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzAwMCIgZD0iTTIyLjI4NDMgOC4zMjg1M0MyMi44NDYgOC4xMjc5OSAyMy4xNDMzIDcuNTA3MzkgMjIuODkzMSA2Ljk2NTk0QzIxLjgxMDIgNC42MjI2IDE5Ljk5NTIgMi42ODEyMSAxNy43MDc2IDEuNDQ0MjdDMTUuMTAyMSAwLjAzNTQzMjIgMTIuMDY3NSAtMC4zNTk5NzkgOS4xODc5NyAwLjMzNDEzMUM2LjMwODQxIDEuMDI4MjQgMy43ODczMSAyLjc2MjgyIDIuMTA5ODQgNS4yMDQwN0MwLjQzMjM1NiA3LjY0NTMyIC0wLjI4Mjk2NSAxMC42MjA3IDAuMTAxNTMgMTMuNTU3N0MwLjQ4NjAyNSAxNi40OTQ3IDEuOTQzMTcgMTkuMTg1NyA0LjE5MjU0IDIxLjExMjhDNi40NDE5MSAyMy4wNCA5LjMyNDU2IDI0LjA2NzEgMTIuMjg1OCAyMy45OTY2QzE1LjI0NjkgMjMuOTI2MSAxOC4wNzc0IDIyLjc2MjggMjAuMjMyNSAyMC43MzA4QzIyLjEyNDYgMTguOTQ2NiAyMy4zNzg3IDE2LjYwMzQgMjMuODIxOCAxNC4wNjAzQzIzLjkyNDIgMTMuNDcyNyAyMy40NzczIDEyLjk0OTUgMjIuODgyOCAxMi45MDA0VjEyLjkwMDRDMjIuMjg4NCAxMi44NTEyIDIxLjc3MjYgMTMuMjk1MiAyMS42NTg2IDEzLjg4MDdDMjEuMjY3IDE1Ljg5MjEgMjAuMjU0NiAxNy43NDExIDE4Ljc1MDYgMTkuMTU5MkMxNi45ODM1IDIwLjgyNTUgMTQuNjYyNSAyMS43Nzk0IDEyLjIzNDMgMjEuODM3MkM5LjgwNjE0IDIxLjg5NSA3LjQ0MjM3IDIxLjA1MjggNS41OTc4OCAxOS40NzI1QzMuNzUzNCAxNy44OTIyIDIuNTU4NTQgMTUuNjg1NiAyLjI0MzI1IDEzLjI3NzNDMS45Mjc5NyAxMC44NjkgMi41MTQ1MyA4LjQyOTE2IDMuODkwMDYgNi40MjczNEM1LjI2NTYgNC40MjU1MiA3LjMzMjkgMy4wMDMxNiA5LjY5NDE0IDIuNDMzOTlDMTIuMDU1NCAxLjg2NDgyIDE0LjU0MzcgMi4xODkwNSAxNi42ODAyIDMuMzQ0M0MxOC40OTg2IDQuMzI3NTEgMTkuOTUyOCA1Ljg1MzUzIDIwLjg0OSA3LjY5NjRDMjEuMTA5OSA4LjIzMjggMjEuNzIyNSA4LjUyOTA3IDIyLjI4NDMgOC4zMjg1M1Y4LjMyODUzWiIvPjwvc3ZnPgo=";var emotion_react_jsx_runtime_browser_esm=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/@emotion+react@11.14.0_@types+react@19.2.18_react@19.2.8_supports-color@10.2.2/node_modules/@emotion/react/jsx-runtime/dist/emotion-react-jsx-runtime.browser.esm.js");function Spinner({size="1.5rem",...props}){return(0,emotion_react_jsx_runtime_browser_esm.Y)(Root,{$size:size,"aria-hidden":!0,...props})}const spin=emotion_react_browser_esm.i7`
+    to {
+        transform: rotate(1turn);
+    }
+`,Root=emotion_styled_browser_esm.A.span`
+  display: block;
+  flex-shrink: 0;
+  width: ${({$size})=>$size};
+  height: ${({$size})=>$size};
+
+  background: conic-gradient(from 90deg, currentColor, transparent);
+
+  -webkit-mask: url("${spinnerMaskurl_namespaceObject}") center / contain no-repeat;
+  mask: url("${spinnerMaskurl_namespaceObject}") center / contain no-repeat;
+
+  animation: ${spin} 0.6s linear infinite;
+`;Spinner.__docgenInfo={description:"회전하는 로딩 표시.",methods:[],displayName:"Spinner",props:{size:{required:!1,tsType:{name:"string"},description:"지름. 부모 글자 크기를 따라가게 하려면 `1em`을 넘기면 돼요.",defaultValue:{value:'"1.5rem"',computed:!1}}},composes:["HTMLAttributes"]}}}]);
+//# sourceMappingURL=modules-features-document-SourceRecording-index-stories.17f00d1f.iframe.bundle.js.map

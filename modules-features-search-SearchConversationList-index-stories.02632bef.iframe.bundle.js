@@ -1,0 +1,202 @@
+"use strict";(self.webpackChunkfrontend=self.webpackChunkfrontend||[]).push([[2902],{"./src/modules/features/search/SearchConversationList/index.stories.tsx"(__unused_webpack_module,__webpack_exports__,__webpack_require__){__webpack_require__.r(__webpack_exports__);var _api_mock_responses_search__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__("./src/shared/api/mock/responses/search.ts"),_routes_PATH_ROUTE__WEBPACK_IMPORTED_MODULE_1__=__webpack_require__("./src/shared/routes/PATH_ROUTE.ts"),msw__WEBPACK_IMPORTED_MODULE_2__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/msw@2.15.0_@types+node@26.1.2_typescript@7.0.2/node_modules/msw/lib/core/http.mjs"),msw__WEBPACK_IMPORTED_MODULE_3__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/msw@2.15.0_@types+node@26.1.2_typescript@7.0.2/node_modules/msw/lib/core/HttpResponse.mjs"),react_router__WEBPACK_IMPORTED_MODULE_4__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/react-router@8.3.0_react-dom@19.2.8_react@19.2.8__react@19.2.8/node_modules/react-router/dist/production/lib/components.js"),___WEBPACK_IMPORTED_MODULE_5__=__webpack_require__("./src/modules/features/search/SearchConversationList/index.tsx"),_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/@emotion+react@11.14.0_@types+react@19.2.18_react@19.2.8_supports-color@10.2.2/node_modules/@emotion/react/jsx-runtime/dist/emotion-react-jsx-runtime.browser.esm.js");const CONVERSATION_PATH=(0,_routes_PATH_ROUTE__WEBPACK_IMPORTED_MODULE_1__.vX)({routeKey:"CHAT_SESSION",params:{workspaceId:"1",sessionId:String(_api_mock_responses_search__WEBPACK_IMPORTED_MODULE_0__.Gq.items[0].id)}}),CONVERSATIONS_URL="*/api/v1/workspaces/:workspaceId/search/conversations",DAY=864e5,fromNow=elapsed=>new Date(Date.now()-elapsed).toISOString(),__WEBPACK_DEFAULT_EXPORT__={title:"Search/SearchConversationList",component:___WEBPACK_IMPORTED_MODULE_5__.A,parameters:{layout:"padded",design:[{name:"대화 목록",type:"figma",url:"https://www.figma.com/design/jyDFCKX5AIztZessq4H7nQ/knot?node-id=580-1961"},{name:"기간 묶음",type:"figma",url:"https://www.figma.com/design/jyDFCKX5AIztZessq4H7nQ/knot?node-id=580-1533"},{name:"SessionRow",type:"figma",url:"https://www.figma.com/design/jyDFCKX5AIztZessq4H7nQ/knot?node-id=1379-8248"},{name:"빈 목록",type:"figma",url:"https://www.figma.com/design/jyDFCKX5AIztZessq4H7nQ/knot?node-id=1254-5857"}],docs:{description:{component:"워크스페이스에 쌓인 내 탐색 대화 목록이에요. 탐색 화면의 대화 목록 드로어(`Chat/ChatListDrawer`) 안에 놓여요.\n\n**동작 규칙**\n- 대화를 마지막으로 메시지가 오간 시각(`updatedAt`)으로 「오늘 / 이번 주 / 지난 30일 / 이전」에 묶어요. 오늘은 날짜가 같은지로, 나머지는 지금으로부터 지난 시간으로 가르고, 대화가 없는 묶음은 감춰요.\n- 같은 묶음 안에서는 마지막으로 메시지가 오간 대화가 위로 와요. 빈 대화와 첫 답변이 실패한 대화는 서버가 목록에서 빼요.\n- 한 줄에는 대화 제목과 마지막으로 오간 시각을 보여 주고, 제목이 길면 한 줄에서 말줄임표로 잘라요.\n- 지금 보고 있는 대화(주소의 대화 ID)는 채워진 모양으로 표시하고, 화면 낭독기에도 지금 보고 있는 대화라고 알려요. 다른 대화를 누르면 그 대화 화면으로 옮겨 가요.\n- 대화가 하나도 없으면 목록 자리에 빈 안내를 띄워요. 대화가 없는 게 오류가 아니라는 것과, 새 대화를 시작하면 목록이 채워진다는 것을 알려 줘요. 목록을 받아 오는 중에도 같은 안내가 보여요.\n- 목록을 받아 오지 못하면 빈 안내 대신 그 자리 가운데에 작은 실패 안내 「대화 목록을 불러오지 못했어요」와 「다시 시도」를 띄워요. 「다시 시도」는 대화 목록만 다시 받아요. 로그인이 풀렸으면(401) 안내 없이 로그인 화면으로 보내요.\n- 목록을 한 번 받은 뒤에는 다시 불러오기가 실패해도 받은 목록을 계속 보여 줘요."}}},decorators:[Story=>(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.Y)(react_router__WEBPACK_IMPORTED_MODULE_4__.fS,{initialEntries:[CONVERSATION_PATH],children:(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.Y)(react_router__WEBPACK_IMPORTED_MODULE_4__.BV,{children:[_routes_PATH_ROUTE__WEBPACK_IMPORTED_MODULE_1__.WS.CHAT,_routes_PATH_ROUTE__WEBPACK_IMPORTED_MODULE_1__.WS.CHAT_SESSION].map(path=>(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.Y)(react_router__WEBPACK_IMPORTED_MODULE_4__.qh,{path,element:(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.Y)("div",{style:{width:"15.5rem",height:"30rem"},children:(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.Y)(Story,{})})},path))})})]},Default={},AllPeriods={parameters:{docs:{story:{inline:!1,iframeHeight:520}},msw:{handlers:{conversations:msw__WEBPACK_IMPORTED_MODULE_2__.L.get(CONVERSATIONS_URL,()=>msw__WEBPACK_IMPORTED_MODULE_3__.cS.json({items:[..._api_mock_responses_search__WEBPACK_IMPORTED_MODULE_0__.Gq.items,{id:103,title:"스프린트 3 회고에서 나온 배포 자동화 개선 아이디어 정리",lastMessagePreview:"배포 자동화는 다음 스프린트에서 진행하기로 했어요.",createdAt:fromNow(12*DAY),updatedAt:fromNow(10*DAY)},{id:104,title:"API 명세 리뷰",lastMessagePreview:"오류 코드 표기는 대문자 스네이크 케이스로 맞췄어요.",createdAt:fromNow(50*DAY),updatedAt:fromNow(45*DAY)}],nextCursor:null}))}}}},LoadFailed={parameters:{docs:{story:{inline:!1,iframeHeight:520}},msw:{handlers:{conversations:msw__WEBPACK_IMPORTED_MODULE_2__.L.get(CONVERSATIONS_URL,()=>new msw__WEBPACK_IMPORTED_MODULE_3__.cS(null,{status:500}))}}}};Default.parameters={...Default.parameters,docs:{...Default.parameters?.docs,source:{originalSource:"{}",...Default.parameters?.docs?.source},description:{story:"대화 하나를 보고 있는 탐색 화면이에요. 보고 있는 대화가 채워진 모양으로 표시돼요.",...Default.parameters?.docs?.description}}},AllPeriods.parameters={...AllPeriods.parameters,docs:{...AllPeriods.parameters?.docs,source:{originalSource:'{\n  parameters: {\n    // 문서 페이지에서는 스토리를 한 화면에 함께 그려 응답이 섞이므로, 이 스토리는 따로 그려요\n    docs: {\n      story: {\n        inline: false,\n        iframeHeight: 520\n      }\n    },\n    msw: {\n      handlers: {\n        conversations: http.get(CONVERSATIONS_URL, () => HttpResponse.json({\n          items: [...searchConversationsResponse.items, {\n            id: 103,\n            title: "스프린트 3 회고에서 나온 배포 자동화 개선 아이디어 정리",\n            lastMessagePreview: "배포 자동화는 다음 스프린트에서 진행하기로 했어요.",\n            createdAt: fromNow(12 * DAY),\n            updatedAt: fromNow(10 * DAY)\n          }, {\n            id: 104,\n            title: "API 명세 리뷰",\n            lastMessagePreview: "오류 코드 표기는 대문자 스네이크 케이스로 맞췄어요.",\n            createdAt: fromNow(50 * DAY),\n            updatedAt: fromNow(45 * DAY)\n          }],\n          nextCursor: null\n        }))\n      }\n    }\n  }\n}',...AllPeriods.parameters?.docs?.source},description:{story:"대화가 여러 기간에 걸쳐 쌓인 워크스페이스예요. 묶음이 최근 기간부터 나오고, 긴 제목은 말줄임표로 잘려요.",...AllPeriods.parameters?.docs?.description}}},LoadFailed.parameters={...LoadFailed.parameters,docs:{...LoadFailed.parameters?.docs,source:{originalSource:"{\n  parameters: {\n    docs: {\n      story: {\n        inline: false,\n        iframeHeight: 520\n      }\n    },\n    msw: {\n      handlers: {\n        conversations: http.get(CONVERSATIONS_URL, () => new HttpResponse(null, {\n          status: 500\n        }))\n      }\n    }\n  }\n}",...LoadFailed.parameters?.docs?.source},description:{story:"대화 목록을 불러오지 못했을 때예요. 서버 오류, 네트워크 문제, 잘못된 요청(400)이 모두 이 모습이에요.\n대화가 없는 빈 목록과 헷갈리지 않게, 목록 자리 가운데에 작은 안내와 「다시 시도」를 보여 줘요.\n이 스토리에서는 「다시 시도」를 눌러도 계속 실패해요.",...LoadFailed.parameters?.docs?.description}}},__webpack_require__.d(__webpack_exports__,["AllPeriods",0,AllPeriods,"Default",0,Default,"LoadFailed",0,LoadFailed,"__namedExportsOrder",0,["Default","AllPeriods","LoadFailed"],"default",0,__WEBPACK_DEFAULT_EXPORT__])},"./src/assets/icons/alert.svg"(__unused_webpack_module,__webpack_exports__,__webpack_require__){var _path,react__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/react@19.2.8/node_modules/react/index.js"),_excluded=["size"];function _extends(){return _extends=Object.assign?Object.assign.bind():function(n){for(var e=1;e<arguments.length;e++){var t=arguments[e];for(var r in t)({}).hasOwnProperty.call(t,r)&&(n[r]=t[r])}return n},_extends.apply(null,arguments)}const __WEBPACK_DEFAULT_EXPORT__=function SvgAlert(_ref){var _ref$size=_ref.size,size=void 0===_ref$size?24:_ref$size,props=function _objectWithoutProperties(e,t){if(null==e)return{};var o,r,i=function _objectWithoutPropertiesLoose(r,e){if(null==r)return{};var t={};for(var n in r)if({}.hasOwnProperty.call(r,n)){if(-1!==e.indexOf(n))continue;t[n]=r[n]}return t}(e,t);if(Object.getOwnPropertySymbols){var n=Object.getOwnPropertySymbols(e);for(r=0;r<n.length;r++)o=n[r],-1===t.indexOf(o)&&{}.propertyIsEnumerable.call(e,o)&&(i[o]=e[o])}return i}(_ref,_excluded);return react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg",_extends({xmlns:"http://www.w3.org/2000/svg",fill:"none",viewBox:"0 0 18 18",width:size,height:size,focusable:"false","aria-hidden":"true"},props),_path||(_path=react__WEBPACK_IMPORTED_MODULE_0__.createElement("path",{stroke:"currentColor",strokeLinecap:"round",strokeLinejoin:"round",strokeWidth:1.6,d:"M9 5.5v4.2m0 2.8v.01M9 2c3.87 0 7 3.13 7 7s-3.13 7-7 7-7-3.13-7-7 3.13-7 7-7"})))};__webpack_require__.d(__webpack_exports__,["A",0,__WEBPACK_DEFAULT_EXPORT__])},"./src/modules/features/search/SearchConversationList/index.tsx"(__unused_webpack_module,__webpack_exports__,__webpack_require__){__webpack_require__.d(__webpack_exports__,{A:()=>SearchConversationList});var emotion_styled_browser_esm=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/@emotion+styled@11.14.1_@emotion+react@11.14.0_@types+react@19.2.18_react@19.2.8_suppor_1e45ff7b04d06d3f2b60330d973b73ec/node_modules/@emotion/styled/dist/emotion-styled.browser.esm.js"),hooks=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/react-router@8.3.0_react-dom@19.2.8_react@19.2.8__react@19.2.8/node_modules/react-router/dist/production/lib/hooks.js"),conversations=__webpack_require__("./src/shared/api/fetch/api/v1/workspaces/[workspaceId]/search/conversations/index.ts"),search=__webpack_require__("./src/shared/api/queryKey/search.ts"),useQuery=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/@tanstack+react-query@5.102.0_react@19.2.8/node_modules/@tanstack/react-query/build/modern/useQuery.js"),utils=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/@tanstack+query-core@5.102.0/node_modules/@tanstack/query-core/build/modern/utils.js");const queries_useSearchConversationsQuery=({workspaceId})=>(0,useQuery.I)({queryKey:search.v.conversations(workspaceId),queryFn:null===workspaceId?utils.hT:()=>(0,conversations.d9)({workspaceId})});var useRedirectToLoginOnUnauthorized=__webpack_require__("./src/shared/hooks/domain/auth/useRedirectToLoginOnUnauthorized/index.ts"),useNavigateToChatSession=__webpack_require__("./src/shared/hooks/domain/chat/useNavigateToChatSession/index.ts");const GROUP_LABELS=["오늘","이번 주","지난 30일","이전"],getGroupIndex=({updatedAt,now})=>{if(b=now,(a=updatedAt).getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate())return 0;var a,b;const elapsed=now.getTime()-updatedAt.getTime();return elapsed<6048e5?1:elapsed<2592e6?2:3},useSearchConversationList=()=>{const{workspaceId,sessionId}=(0,hooks.g)(),{navigateToChatSession}=(0,useNavigateToChatSession.A)(),{data,error,isError,refetch}=queries_useSearchConversationsQuery({workspaceId:workspaceId?Number(workspaceId):null}),{isUnauthorized}=(0,useRedirectToLoginOnUnauthorized.A)({error}),groups=(({conversations,now=new Date})=>{const grouped=GROUP_LABELS.map(()=>[]);for(const conversation of conversations)grouped[getGroupIndex({updatedAt:new Date(conversation.updatedAt),now})].push(conversation);const groups=[];return grouped.forEach((groupConversations,index)=>{0!==groupConversations.length&&groups.push({label:GROUP_LABELS[index],conversations:[...groupConversations].sort((a,b)=>new Date(b.updatedAt).getTime()-new Date(a.updatedAt).getTime())})}),groups})({conversations:data?.items??[]});return{groups,openedConversationId:sessionId??null,isLoadFailed:void 0===data&&isError&&!isUnauthorized,handleSelectConversation:conversationId=>{workspaceId&&navigateToChatSession({workspaceId,sessionId:String(conversationId)})},handleRetry:()=>{refetch()}}};var emotion_react_jsx_runtime_browser_esm=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/@emotion+react@11.14.0_@types+react@19.2.18_react@19.2.8_supports-color@10.2.2/node_modules/@emotion/react/jsx-runtime/dist/emotion-react-jsx-runtime.browser.esm.js");function EmptySearchConversationList(){return(0,emotion_react_jsx_runtime_browser_esm.FD)(Container,{children:[(0,emotion_react_jsx_runtime_browser_esm.Y)(Title,{children:"아직 나눈 대화가 없어요"}),(0,emotion_react_jsx_runtime_browser_esm.Y)(Description,{children:"새 대화를 시작하면 여기에 기록이 남아요"})]})}const Container=emotion_styled_browser_esm.A.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+`,Title=emotion_styled_browser_esm.A.strong`
+  ${({theme})=>theme.text.label01};
+  color: ${({theme})=>theme.neutral[900]};
+`,Description=emotion_styled_browser_esm.A.span`
+  ${({theme})=>theme.text.caption02};
+  color: ${({theme})=>theme.neutral[600]};
+`;EmptySearchConversationList.__docgenInfo={description:"워크스페이스에 아직 대화가 하나도 없을 때 목록 자리에 놓이는 안내.\n\n대화가 없는 게 오류가 아니라는 것과, 어떻게 하면 목록이 채워지는지를 알려줍니다.",methods:[],displayName:"EmptySearchConversationList"};const formatRelativeTime=({date,now=new Date})=>{const elapsed=now.getTime()-new Date(date).getTime();return elapsed<6e4?"방금":elapsed<36e5?`${Math.floor(elapsed/6e4)}분 전`:elapsed<864e5?`${Math.floor(elapsed/36e5)}시간 전`:elapsed<6048e5?`${Math.floor(elapsed/864e5)}일 전`:elapsed<2592e6?`${Math.floor(elapsed/6048e5)}주 전`:elapsed<31536e6?`${Math.floor(elapsed/2592e6)}개월 전`:`${Math.floor(elapsed/31536e6)}년 전`};function SearchConversationRow({title,updatedAtLabel,isSelected=!1,onSelect}){return(0,emotion_react_jsx_runtime_browser_esm.FD)(SearchConversationRow_Container,{type:"button","aria-current":isSelected?"page":void 0,$isSelected:isSelected,onClick:onSelect,children:[(0,emotion_react_jsx_runtime_browser_esm.Y)(SearchConversationRow_Title,{$isSelected:isSelected,children:title}),(0,emotion_react_jsx_runtime_browser_esm.Y)(Time,{children:updatedAtLabel})]})}const SearchConversationRow_Container=emotion_styled_browser_esm.A.button`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1875rem; /* 3px */
+  width: 100%;
+  padding: 0.625rem; /* 10px */
+  border-radius: 0.75rem; /* 12px */
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in;
+
+  background-color: ${({theme,$isSelected})=>$isSelected?theme.neutral[100]:"transparent"};
+
+  &:hover {
+    background-color: ${({theme})=>theme.neutral[100]};
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({theme})=>theme.sub.accent[500]};
+    outline-offset: 2px;
+  }
+`,SearchConversationRow_Title=emotion_styled_browser_esm.A.span`
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  ${({theme})=>theme.text.caption02};
+
+  color: ${({theme,$isSelected})=>$isSelected?theme.neutral[900]:theme.neutral[600]};
+`,Time=emotion_styled_browser_esm.A.span`
+  ${({theme})=>theme.text.caption01};
+  color: ${({theme})=>theme.neutral[600]};
+`;function SearchConversationGroup({label,conversations,openedConversationId,onSelectConversation}){return(0,emotion_react_jsx_runtime_browser_esm.FD)(SearchConversationGroup_Container,{children:[(0,emotion_react_jsx_runtime_browser_esm.Y)(Label,{children:label}),(0,emotion_react_jsx_runtime_browser_esm.Y)(Rows,{children:conversations.map(({id,title,updatedAt})=>(0,emotion_react_jsx_runtime_browser_esm.Y)(SearchConversationRow,{title,updatedAtLabel:formatRelativeTime({date:updatedAt}),isSelected:openedConversationId===String(id),onSelect:()=>onSelectConversation(id)},id))})]})}SearchConversationRow.__docgenInfo={description:"대화 목록의 한 줄. 대화 제목과 마지막으로 오간 시각을 보여줍니다.\n\n지금 보고 있는 대화는 `isSelected`로 채워진 모양이 되며, 이 상태를 `aria-current`로도 알립니다.",methods:[],displayName:"SearchConversationRow",props:{title:{required:!0,tsType:{name:"string"},description:""},updatedAtLabel:{required:!0,tsType:{name:"string"},description:'마지막으로 메시지가 오간 시각을 "2일 전"처럼 바꾼 문구'},isSelected:{required:!1,tsType:{name:"boolean"},description:"",defaultValue:{value:"false",computed:!1}},onSelect:{required:!0,tsType:{name:"signature",type:"function",raw:"() => void",signature:{arguments:[],return:{name:"void"}}},description:""}}};const SearchConversationGroup_Container=emotion_styled_browser_esm.A.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+`,Label=emotion_styled_browser_esm.A.h3`
+  width: 100%;
+  ${({theme})=>theme.text.caption01};
+  color: ${({theme})=>theme.neutral[600]};
+`,Rows=emotion_styled_browser_esm.A.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* 8px */
+  width: 100%;
+`;SearchConversationGroup.__docgenInfo={description:'"오늘"처럼 같은 기간에 묶인 대화를 기간 이름과 함께 보여줍니다.',methods:[],displayName:"SearchConversationGroup",props:{label:{required:!0,tsType:{name:"string"},description:""},conversations:{required:!0,tsType:{name:"Array",elements:[{name:"SearchConversationListItem"}],raw:"SearchConversationListItem[]"},description:""},openedConversationId:{required:!0,tsType:{name:"union",raw:"string | null",elements:[{name:"string"},{name:"null"}]},description:""},onSelectConversation:{required:!0,tsType:{name:"signature",type:"function",raw:"(conversationId: number) => void",signature:{arguments:[{type:{name:"number"},name:"conversationId"}],return:{name:"void"}}},description:""}}};var InlineError=__webpack_require__("./src/shared/components/primitives/ui/InlineError/index.tsx");function SearchConversationListLoadFailed({onRetry}){return(0,emotion_react_jsx_runtime_browser_esm.Y)(Root,{children:(0,emotion_react_jsx_runtime_browser_esm.Y)(InlineError.A,{message:"대화 목록을 불러오지 못했어요",onRetry,size:"sm",align:"center"})})}const Root=emotion_styled_browser_esm.A.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+`;function SearchConversationList(){const{groups,openedConversationId,isLoadFailed,handleSelectConversation,handleRetry}=useSearchConversationList();return isLoadFailed?(0,emotion_react_jsx_runtime_browser_esm.Y)(SearchConversationListLoadFailed,{onRetry:handleRetry}):0===groups.length?(0,emotion_react_jsx_runtime_browser_esm.Y)(EmptySearchConversationList,{}):(0,emotion_react_jsx_runtime_browser_esm.Y)(SearchConversationList_Container,{children:groups.map(({label,conversations})=>(0,emotion_react_jsx_runtime_browser_esm.Y)(SearchConversationGroup,{label,conversations,openedConversationId,onSelectConversation:handleSelectConversation},label))})}SearchConversationListLoadFailed.__docgenInfo={description:"대화 목록을 불러오지 못했을 때 목록 자리에 놓이는 안내.\n\n대화가 없는 빈 목록과 구분되도록, 빈 안내 대신 실패 안내와 `다시 시도`를 둬요.\n드로어는 폭이 좁아 사이드바의 문서 목록 실패(`DocumentTreeLoadFailed`)처럼 작은 안내를 써요.",methods:[],displayName:"SearchConversationListLoadFailed",props:{onRetry:{required:!0,tsType:{name:"signature",type:"function",raw:"() => void",signature:{arguments:[],return:{name:"void"}}},description:"`다시 시도`를 눌렀을 때 실행할 동작"}}};const SearchConversationList_Container=emotion_styled_browser_esm.A.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem; /* 12px */
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+`;SearchConversationList.__docgenInfo={description:"워크스페이스에 쌓인 내 탐색 대화 목록.\n\n목록을 받지 못하고 실패하면 빈 안내 대신 실패 안내(`SearchConversationListLoadFailed`)를 둬요. 「다시 시도」는 대화 목록만 다시 받아요.",methods:[],displayName:"SearchConversationList"}},"./src/shared/components/primitives/ui/Button/index.tsx"(__unused_webpack_module,__webpack_exports__,__webpack_require__){__webpack_require__.d(__webpack_exports__,{A:()=>Button});var _emotion_react__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/@emotion+react@11.14.0_@types+react@19.2.18_react@19.2.8_supports-color@10.2.2/node_modules/@emotion/react/dist/emotion-react.browser.esm.js"),_emotion_styled__WEBPACK_IMPORTED_MODULE_1__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/@emotion+styled@11.14.1_@emotion+react@11.14.0_@types+react@19.2.18_react@19.2.8_suppor_1e45ff7b04d06d3f2b60330d973b73ec/node_modules/@emotion/styled/dist/emotion-styled.browser.esm.js"),_shared_components_primitives_ui_Spinner__WEBPACK_IMPORTED_MODULE_2__=__webpack_require__("./src/shared/components/primitives/ui/Spinner/index.tsx"),_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/@emotion+react@11.14.0_@types+react@19.2.18_react@19.2.8_supports-color@10.2.2/node_modules/@emotion/react/jsx-runtime/dist/emotion-react-jsx-runtime.browser.esm.js");const BUTTON_SIZE={lg:{paddingX:"1.25rem",paddingY:"1rem",borderRadius:"0.875rem",gap:"0.5rem",iconSize:"1.5rem",spinnerSize:"1.5rem"},md:{paddingX:"1.125rem",paddingY:"0.75rem",borderRadius:"0.8125rem",gap:"0.4375rem",iconSize:"1.125rem",spinnerSize:"1.375rem"},sm:{paddingX:"1rem",paddingY:"0.5rem",borderRadius:"0.75rem",gap:"0.375rem",iconSize:"1rem",spinnerSize:"1.25rem"}};function Button({size="md",variant="filled",isLoading=!1,isFullWidth=!1,disabled=!1,type="button",children,...props}){const status=isLoading?"loading":disabled?"inactive":"active";return(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.FD)(Root,{type,disabled:disabled||isLoading,"aria-busy":isLoading,$size:size,$variant:variant,$status:status,$isFullWidth:isFullWidth,...props,children:[(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Y)(Content,{$isHidden:isLoading,$size:size,children}),isLoading&&(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Y)(SpinnerWrapper,{children:(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Y)(_shared_components_primitives_ui_Spinner__WEBPACK_IMPORTED_MODULE_2__.A,{size:BUTTON_SIZE[size].spinnerSize})})]})}const Root=_emotion_styled__WEBPACK_IMPORTED_MODULE_1__.A.button`
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  transition:
+    background-color 0.3s ease-in,
+    color 0.3s ease-in,
+    box-shadow 0.3s ease-in;
+
+  ${({theme})=>theme.text.label01};
+
+  width: ${({$isFullWidth})=>$isFullWidth?"100%":"auto"};
+  padding: ${({$size})=>`${BUTTON_SIZE[$size].paddingY} ${BUTTON_SIZE[$size].paddingX}`};
+  border-radius: ${({$size})=>BUTTON_SIZE[$size].borderRadius};
+
+  ${({theme,$variant,$status})=>(theme=>({filled:{active:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.primary};
+        color: ${theme.neutral[0]};
+      `,loading:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.primary};
+        color: ${theme.neutral[0]};
+      `,inactive:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.neutral[200]};
+        color: ${theme.neutral[400]};
+      `},outline:{active:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.neutral[0]};
+        color: ${theme.neutral[700]};
+        box-shadow: inset 0 0 0 1px ${theme.neutral[200]};
+      `,loading:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.neutral[0]};
+        color: ${theme.neutral[700]};
+        box-shadow: inset 0 0 0 1px ${theme.neutral[200]};
+      `,inactive:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.neutral[0]};
+        color: ${theme.neutral[400]};
+        box-shadow: inset 0 0 0 1px ${theme.neutral[200]};
+      `},accent:{active:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.sub.accent[100]};
+        color: ${theme.sub.accent[500]};
+      `,loading:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.sub.accent[100]};
+        color: ${theme.sub.accent[500]};
+      `,inactive:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.neutral[200]};
+        color: ${theme.neutral[400]};
+      `},danger:{active:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.sub.warning[600]};
+        color: ${theme.neutral[0]};
+      `,loading:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.sub.warning[600]};
+        color: ${theme.neutral[0]};
+      `,inactive:_emotion_react__WEBPACK_IMPORTED_MODULE_0__.AH`
+        background-color: ${theme.neutral[200]};
+        color: ${theme.neutral[400]};
+      `}}))(theme)[$variant][$status]};
+
+  /* 포커스 링 아웃라인 논의 필요 */
+  &:focus-visible {
+    outline: 2px solid ${({theme})=>theme.sub.accent[500]};
+    outline-offset: 2px;
+  }
+`,Content=_emotion_styled__WEBPACK_IMPORTED_MODULE_1__.A.span`
+  display: inline-flex;
+  align-items: center;
+  gap: ${({$size})=>BUTTON_SIZE[$size].gap};
+  opacity: ${({$isHidden})=>$isHidden?0:1};
+
+  & > svg {
+    flex-shrink: 0;
+    width: ${({$size})=>BUTTON_SIZE[$size].iconSize};
+    height: ${({$size})=>BUTTON_SIZE[$size].iconSize};
+  }
+`,SpinnerWrapper=_emotion_styled__WEBPACK_IMPORTED_MODULE_1__.A.span`
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;Button.__docgenInfo={description:"액션을 실행하는 버튼.",methods:[],displayName:"Button",props:{size:{required:!1,tsType:{name:"union",raw:'"lg" | "md" | "sm"',elements:[{name:"literal",value:'"lg"'},{name:"literal",value:'"md"'},{name:"literal",value:'"sm"'}]},description:"",defaultValue:{value:'"md"',computed:!1}},variant:{required:!1,tsType:{name:"union",raw:'"filled" | "outline" | "accent" | "danger"',elements:[{name:"literal",value:'"filled"'},{name:"literal",value:'"outline"'},{name:"literal",value:'"accent"'},{name:"literal",value:'"danger"'}]},description:"",defaultValue:{value:'"filled"',computed:!1}},isLoading:{required:!1,tsType:{name:"boolean"},description:"",defaultValue:{value:"false",computed:!1}},isFullWidth:{required:!1,tsType:{name:"boolean"},description:"",defaultValue:{value:"false",computed:!1}},disabled:{defaultValue:{value:"false",computed:!1},required:!1},type:{defaultValue:{value:'"button"',computed:!1},required:!1}},composes:["ButtonHTMLAttributes"]}},"./src/shared/components/primitives/ui/InlineError/index.tsx"(__unused_webpack_module,__webpack_exports__,__webpack_require__){__webpack_require__.d(__webpack_exports__,{A:()=>InlineError});var _emotion_styled__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/@emotion+styled@11.14.1_@emotion+react@11.14.0_@types+react@19.2.18_react@19.2.8_suppor_1e45ff7b04d06d3f2b60330d973b73ec/node_modules/@emotion/styled/dist/emotion-styled.browser.esm.js"),_primitives_ui_Button__WEBPACK_IMPORTED_MODULE_1__=__webpack_require__("./src/shared/components/primitives/ui/Button/index.tsx"),_assets_icons_alert_svg__WEBPACK_IMPORTED_MODULE_2__=__webpack_require__("./src/assets/icons/alert.svg"),_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/@emotion+react@11.14.0_@types+react@19.2.18_react@19.2.8_supports-color@10.2.2/node_modules/@emotion/react/jsx-runtime/dist/emotion-react-jsx-runtime.browser.esm.js");const ALIGN={start:"flex-start",center:"center"},SIZE={md:{iconSize:18,messageGap:"0.5rem",gap:"0.75rem"},sm:{iconSize:16,messageGap:"0.375rem",gap:"0.625rem"}};function InlineError({message,onRetry,isRetrying=!1,align="start",size="md"}){return(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.FD)(Container,{role:"alert",$align:align,$size:size,children:[(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.FD)(MessageRow,{$size:size,children:[(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Y)(Icon,{"aria-hidden":!0,size:SIZE[size].iconSize}),(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Y)(Message,{$size:size,children:message})]}),void 0!==onRetry&&("sm"===size?(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Y)(SmallRetryButton,{type:"button",disabled:isRetrying,onClick:onRetry,children:"다시 시도"}):(0,_emotion_react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Y)(_primitives_ui_Button__WEBPACK_IMPORTED_MODULE_1__.A,{size:"sm",variant:"outline",isLoading:isRetrying,onClick:onRetry,children:"다시 시도"}))]})}const Container=_emotion_styled__WEBPACK_IMPORTED_MODULE_0__.A.div`
+  display: flex;
+  flex-direction: column;
+  align-items: ${({$align})=>ALIGN[$align]};
+  gap: ${({$size})=>SIZE[$size].gap};
+`,MessageRow=_emotion_styled__WEBPACK_IMPORTED_MODULE_0__.A.div`
+  display: flex;
+  align-items: center;
+  gap: ${({$size})=>SIZE[$size].messageGap};
+`,Icon=(0,_emotion_styled__WEBPACK_IMPORTED_MODULE_0__.A)(_assets_icons_alert_svg__WEBPACK_IMPORTED_MODULE_2__.A)`
+  flex-shrink: 0;
+  color: ${({theme})=>theme.sub.warning[700]};
+`,Message=_emotion_styled__WEBPACK_IMPORTED_MODULE_0__.A.p`
+  ${({theme,$size})=>"sm"===$size?theme.text.caption02:theme.text.body01};
+  color: ${({theme})=>theme.neutral[700]};
+  overflow-wrap: break-word;
+`,SmallRetryButton=_emotion_styled__WEBPACK_IMPORTED_MODULE_0__.A.button`
+  ${({theme})=>theme.text.caption01};
+  padding: 0.375rem 0.75rem; /* 6px 12px */
+  border-radius: 62.4375rem; /* 999px */
+  background-color: ${({theme})=>theme.neutral[0]};
+  box-shadow: inset 0 0 0 1px ${({theme})=>theme.neutral[200]};
+  color: ${({theme})=>theme.neutral[700]};
+  white-space: nowrap;
+
+  &:focus-visible {
+    outline: 2px solid ${({theme})=>theme.sub.accent[500]};
+    outline-offset: 2px;
+  }
+`;InlineError.__docgenInfo={description:'화면 안 한 영역이나 한 동작만 실패했을 때, 그 내용이 있어야 할 자리에 남기는 안내.\n\n경고색은 아이콘에만 쓰고 문구는 본문 색이에요.\n같은 실패를 토스트로 또 알리지 않아요.\n낭독기가 바로 읽도록 `role="alert"`를 붙였어요.',methods:[],displayName:"InlineError",props:{message:{required:!0,tsType:{name:"string"},description:"무엇이 안 됐는지 알리는 문구"},onRetry:{required:!1,tsType:{name:"signature",type:"function",raw:"() => void",signature:{arguments:[],return:{name:"void"}}},description:"`다시 시도`를 눌렀을 때 실행할 동작. 다시 시도할 수 없는 실패면 넘기지 않고, 그때는 `다시 시도`를 그리지 않아요"},isRetrying:{required:!1,tsType:{name:"boolean"},description:"다시 시도 요청의 응답을 기다리는 중인지. 그동안 「다시 시도」를 누를 수 없고, 기본 크기에서는 버튼에 로딩을 그려요.\n@default false",defaultValue:{value:"false",computed:!1}},align:{required:!1,tsType:{name:"union",raw:"keyof typeof ALIGN",elements:[{name:"literal",value:"start"},{name:"literal",value:"center"}]},description:'문구와 `다시 시도`의 가로 정렬. 그 자리의 빈 상태 안내와 같은 정렬을 골라요.\n영역 전체를 대신할 때는 `center`(예: 홈 카드), 글 흐름 안에 들어갈 때는 `start`(예: 탐색 답변)예요.\n@default "start"',defaultValue:{value:'"start"',computed:!1}},size:{required:!1,tsType:{name:"union",raw:"keyof typeof SIZE",elements:[{name:"literal",value:"md"},{name:"literal",value:"sm"}]},description:'안내의 크기. 폭이 좁은 자리에는 `sm`을 골라요(예: 사이드바의 문서 목록).\n`sm`은 아이콘 · 문구 · `다시 시도`가 모두 한 단계 작아요.\n@default "md"',defaultValue:{value:'"md"',computed:!1}}}}},"./src/shared/components/primitives/ui/Spinner/index.tsx"(__unused_webpack_module,__webpack_exports__,__webpack_require__){__webpack_require__.d(__webpack_exports__,{A:()=>Spinner});var emotion_styled_browser_esm=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/@emotion+styled@11.14.1_@emotion+react@11.14.0_@types+react@19.2.18_react@19.2.8_suppor_1e45ff7b04d06d3f2b60330d973b73ec/node_modules/@emotion/styled/dist/emotion-styled.browser.esm.js"),emotion_react_browser_esm=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/@emotion+react@11.14.0_@types+react@19.2.18_react@19.2.8_supports-color@10.2.2/node_modules/@emotion/react/dist/emotion-react.browser.esm.js");const spinnerMaskurl_namespaceObject="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzAwMCIgZD0iTTIyLjI4NDMgOC4zMjg1M0MyMi44NDYgOC4xMjc5OSAyMy4xNDMzIDcuNTA3MzkgMjIuODkzMSA2Ljk2NTk0QzIxLjgxMDIgNC42MjI2IDE5Ljk5NTIgMi42ODEyMSAxNy43MDc2IDEuNDQ0MjdDMTUuMTAyMSAwLjAzNTQzMjIgMTIuMDY3NSAtMC4zNTk5NzkgOS4xODc5NyAwLjMzNDEzMUM2LjMwODQxIDEuMDI4MjQgMy43ODczMSAyLjc2MjgyIDIuMTA5ODQgNS4yMDQwN0MwLjQzMjM1NiA3LjY0NTMyIC0wLjI4Mjk2NSAxMC42MjA3IDAuMTAxNTMgMTMuNTU3N0MwLjQ4NjAyNSAxNi40OTQ3IDEuOTQzMTcgMTkuMTg1NyA0LjE5MjU0IDIxLjExMjhDNi40NDE5MSAyMy4wNCA5LjMyNDU2IDI0LjA2NzEgMTIuMjg1OCAyMy45OTY2QzE1LjI0NjkgMjMuOTI2MSAxOC4wNzc0IDIyLjc2MjggMjAuMjMyNSAyMC43MzA4QzIyLjEyNDYgMTguOTQ2NiAyMy4zNzg3IDE2LjYwMzQgMjMuODIxOCAxNC4wNjAzQzIzLjkyNDIgMTMuNDcyNyAyMy40NzczIDEyLjk0OTUgMjIuODgyOCAxMi45MDA0VjEyLjkwMDRDMjIuMjg4NCAxMi44NTEyIDIxLjc3MjYgMTMuMjk1MiAyMS42NTg2IDEzLjg4MDdDMjEuMjY3IDE1Ljg5MjEgMjAuMjU0NiAxNy43NDExIDE4Ljc1MDYgMTkuMTU5MkMxNi45ODM1IDIwLjgyNTUgMTQuNjYyNSAyMS43Nzk0IDEyLjIzNDMgMjEuODM3MkM5LjgwNjE0IDIxLjg5NSA3LjQ0MjM3IDIxLjA1MjggNS41OTc4OCAxOS40NzI1QzMuNzUzNCAxNy44OTIyIDIuNTU4NTQgMTUuNjg1NiAyLjI0MzI1IDEzLjI3NzNDMS45Mjc5NyAxMC44NjkgMi41MTQ1MyA4LjQyOTE2IDMuODkwMDYgNi40MjczNEM1LjI2NTYgNC40MjU1MiA3LjMzMjkgMy4wMDMxNiA5LjY5NDE0IDIuNDMzOTlDMTIuMDU1NCAxLjg2NDgyIDE0LjU0MzcgMi4xODkwNSAxNi42ODAyIDMuMzQ0M0MxOC40OTg2IDQuMzI3NTEgMTkuOTUyOCA1Ljg1MzUzIDIwLjg0OSA3LjY5NjRDMjEuMTA5OSA4LjIzMjggMjEuNzIyNSA4LjUyOTA3IDIyLjI4NDMgOC4zMjg1M1Y4LjMyODUzWiIvPjwvc3ZnPgo=";var emotion_react_jsx_runtime_browser_esm=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/@emotion+react@11.14.0_@types+react@19.2.18_react@19.2.8_supports-color@10.2.2/node_modules/@emotion/react/jsx-runtime/dist/emotion-react-jsx-runtime.browser.esm.js");function Spinner({size="1.5rem",...props}){return(0,emotion_react_jsx_runtime_browser_esm.Y)(Root,{$size:size,"aria-hidden":!0,...props})}const spin=emotion_react_browser_esm.i7`
+    to {
+        transform: rotate(1turn);
+    }
+`,Root=emotion_styled_browser_esm.A.span`
+  display: block;
+  flex-shrink: 0;
+  width: ${({$size})=>$size};
+  height: ${({$size})=>$size};
+
+  background: conic-gradient(from 90deg, currentColor, transparent);
+
+  -webkit-mask: url("${spinnerMaskurl_namespaceObject}") center / contain no-repeat;
+  mask: url("${spinnerMaskurl_namespaceObject}") center / contain no-repeat;
+
+  animation: ${spin} 0.6s linear infinite;
+`;Spinner.__docgenInfo={description:"회전하는 로딩 표시.",methods:[],displayName:"Spinner",props:{size:{required:!1,tsType:{name:"string"},description:"지름. 부모 글자 크기를 따라가게 하려면 `1em`을 넘기면 돼요.",defaultValue:{value:'"1.5rem"',computed:!1}}},composes:["HTMLAttributes"]}},"./src/shared/hooks/domain/auth/useNavigateToLogin/index.ts"(__unused_webpack_module,__webpack_exports__,__webpack_require__){var _routes_PATH_ROUTE__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__("./src/shared/routes/PATH_ROUTE.ts"),react__WEBPACK_IMPORTED_MODULE_1__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/react@19.2.8/node_modules/react/index.js"),react_router__WEBPACK_IMPORTED_MODULE_2__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/react-router@8.3.0_react-dom@19.2.8_react@19.2.8__react@19.2.8/node_modules/react-router/dist/production/lib/hooks.js");const __WEBPACK_DEFAULT_EXPORT__=()=>{const navigate=(0,react_router__WEBPACK_IMPORTED_MODULE_2__.Zp)();return{navigateToLogin:(0,react__WEBPACK_IMPORTED_MODULE_1__.useCallback)(({replace=!1}={})=>{navigate(_routes_PATH_ROUTE__WEBPACK_IMPORTED_MODULE_0__.WS.LOGIN,{replace})},[navigate])}};__webpack_require__.d(__webpack_exports__,["A",0,__WEBPACK_DEFAULT_EXPORT__])},"./src/shared/hooks/domain/auth/useRedirectToLoginOnUnauthorized/index.ts"(__unused_webpack_module,__webpack_exports__,__webpack_require__){var _hooks_domain_auth_useNavigateToLogin__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__("./src/shared/hooks/domain/auth/useNavigateToLogin/index.ts"),_utils_isUnauthorizedError__WEBPACK_IMPORTED_MODULE_1__=__webpack_require__("./src/shared/utils/isUnauthorizedError/index.ts"),react__WEBPACK_IMPORTED_MODULE_2__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/react@19.2.8/node_modules/react/index.js");const __WEBPACK_DEFAULT_EXPORT__=({error})=>{const{navigateToLogin}=(0,_hooks_domain_auth_useNavigateToLogin__WEBPACK_IMPORTED_MODULE_0__.A)(),isUnauthorized=(0,_utils_isUnauthorizedError__WEBPACK_IMPORTED_MODULE_1__.d)(error);return(0,react__WEBPACK_IMPORTED_MODULE_2__.useEffect)(()=>{isUnauthorized&&navigateToLogin({replace:!0})},[isUnauthorized,navigateToLogin]),{isUnauthorized}};__webpack_require__.d(__webpack_exports__,["A",0,__WEBPACK_DEFAULT_EXPORT__])},"./src/shared/hooks/domain/chat/useNavigateToChatSession/index.ts"(__unused_webpack_module,__webpack_exports__,__webpack_require__){var react_router__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/react-router@8.3.0_react-dom@19.2.8_react@19.2.8__react@19.2.8/node_modules/react-router/dist/production/lib/hooks.js"),_routes_PATH_ROUTE__WEBPACK_IMPORTED_MODULE_1__=__webpack_require__("./src/shared/routes/PATH_ROUTE.ts");const __WEBPACK_DEFAULT_EXPORT__=()=>{const navigate=(0,react_router__WEBPACK_IMPORTED_MODULE_0__.Zp)();return{navigateToChatSession:({workspaceId,sessionId,replace=!1})=>{navigate((0,_routes_PATH_ROUTE__WEBPACK_IMPORTED_MODULE_1__.vX)({routeKey:"CHAT_SESSION",params:{workspaceId,sessionId}}),{replace})}}};__webpack_require__.d(__webpack_exports__,["A",0,__WEBPACK_DEFAULT_EXPORT__])},"./src/shared/routes/PATH_ROUTE.ts"(__unused_webpack_module,__webpack_exports__,__webpack_require__){var react_router__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__("../../../../Users/yongtae/Desktop/knot-personal/frontend/node_modules/.pnpm/react-router@8.3.0_react-dom@19.2.8_react@19.2.8__react@19.2.8/node_modules/react-router/dist/production/lib/router/utils.js");const PATH_ROUTE={HOME:"/",LANDING_TECHNOLOGY:"/landing/technology",LOGIN:"/login",LOGIN_FAILED:"/login/failed",ONBOARDING:"/onboarding",ONBOARDING_COMPLETE:"/onboarding/complete",WORKSPACE:"/workspace",WORKSPACE_CREATE:"/workspace/create",WORKSPACE_CODE:"/workspace/code",WORKSPACE_HOME:"/workspace/:workspaceId",WORKSPACE_INVITE:"/workspace/:workspaceId/invite",WORKSPACE_JOIN:"/workspace/:workspaceId/join",CHAT:"/workspace/:workspaceId/chat",CHAT_SESSION:"/workspace/:workspaceId/chat/:sessionId",RECORDING:"/workspace/:workspaceId/recording",RECORDING_DOCUMENTS:"/workspace/:workspaceId/recordings/:recordingId",RECORDING_DOCUMENT:"/workspace/:workspaceId/recordings/:recordingId/document",DOCUMENTS:"/workspace/:workspaceId/documents",DOCUMENTS_BY_RECORDING:"/workspace/:workspaceId/documents/recordings",DOCUMENTS_BY_TOPIC:"/workspace/:workspaceId/documents/topics",DOCUMENT:"/workspace/:workspaceId/documents/:documentId",INVITE:"/invite/:token",JOIN_ERROR:"/join-error"};__webpack_require__.d(__webpack_exports__,["Iq",0,value=>Object.entries(PATH_ROUTE).some(([key,path])=>key===value&&":workspaceId"===path.match(/:\w+|\*/g)?.join()),"WS",0,PATH_ROUTE,"vX",0,({routeKey,params})=>{const path=PATH_ROUTE[routeKey];return(0,react_router__WEBPACK_IMPORTED_MODULE_0__.tW)(path,params)}])},"./src/shared/utils/isUnauthorizedError/index.ts"(__unused_webpack_module,__webpack_exports__,__webpack_require__){var _api_httpClient_error__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__("./src/shared/api/httpClient/error/index.ts");__webpack_require__.d(__webpack_exports__,["d",0,error=>(0,_api_httpClient_error__WEBPACK_IMPORTED_MODULE_0__.d)(error,_api_httpClient_error__WEBPACK_IMPORTED_MODULE_0__.$l.unauthorized)])}}]);
+//# sourceMappingURL=modules-features-search-SearchConversationList-index-stories.02632bef.iframe.bundle.js.map
