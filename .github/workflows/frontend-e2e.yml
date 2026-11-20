@@ -1,6 +1,6 @@
 name: Frontend E2E
 
-# develop, main으로 가는 PR마다 관련 QA와 E2E가 이어져 있는지(qa-link) 보고, 핵심 여정 E2E(@core)와 관련 QA의 E2E를 돌려요.
+# dev, main으로 가는 PR마다 관련 QA와 E2E가 이어져 있는지(qa-link) 보고, 핵심 여정 E2E(@core)와 관련 QA의 E2E를 돌려요.
 # - 브라우저는 실제 서버 대신 dev 서버의 msw mock 응답으로 돌아요(playwright.config.ts의 webServer).
 # - QA 시트(노션)는 읽지 않아요. qa-link는 PR 본문의 「## 관련 QA」와 E2E 이름 앞 [QA ID]만 맞춰 봐요.
 # - 결과는 PR 댓글 하나(다시 돌면 같은 댓글을 고쳐요)와 job summary에 쓰고, 보고서 artifact는 통과해도 올려요.
@@ -13,7 +13,7 @@ on:
   pull_request:
     types: [opened, edited, synchronize, reopened]
     branches:
-      - develop
+      - dev
       - main
 
 permissions:

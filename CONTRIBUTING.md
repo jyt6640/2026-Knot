@@ -9,6 +9,10 @@
 
 ## 브랜치
 
+- 일상적인 개발은 `dev`에서 시작하고 작업 PR의 대상은 `dev`로 지정합니다.
+- 릴리스는 `dev`에서 `be/release/#번호` 또는 `fe/release/#번호` 브랜치를 만든 뒤 `main`으로 PR을 엽니다.
+- 병합한 작업 브랜치는 GitHub에서 자동으로 정리합니다.
+
 브랜치는 `<area>/<type>/#<issue-number>` 형식을 사용합니다.
 
 ```text

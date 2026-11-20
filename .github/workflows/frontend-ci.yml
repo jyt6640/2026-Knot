@@ -8,12 +8,12 @@ on:
   pull_request:
   push:
     branches:
-      - develop
+      - dev
 
 permissions:
   contents: read
 
-# 같은 PR에 새로 푸시하면 이전 실행은 의미가 없어 취소해요. develop은 커밋마다 결과를 남기려고 취소하지 않아요
+# 같은 PR에 새로 푸시하면 이전 실행은 의미가 없어 취소해요. dev는 커밋마다 결과를 남기려고 취소하지 않아요
 concurrency:
   group: frontend-ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
