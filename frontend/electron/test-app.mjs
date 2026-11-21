@@ -31,6 +31,9 @@ export const test = base.extend({
         ...(bundle
           ? ["--ignore-certificate-errors-spki-list=" + pin]
           : [fileURLToPath(new URL("main.cjs", import.meta.url))]),
+        ...(process.env.KNOT_TEST_INTERNAL_DISPLAY === "1"
+          ? ["--knot-test-internal-display"]
+          : []),
         "--user-data-dir=" + info.outputPath("profile"),
         "--use-fake-device-for-media-stream",
         "--use-fake-ui-for-media-stream",
