@@ -23,9 +23,11 @@
     "test:release-note": "node --test scripts/release-note.test.mjs",
     "qa:link": "node scripts/qa-link.mjs",
     "desktop": "electron electron/main.cjs",
+    "package:mac": "node electron/package-mac.mjs",
     "test:desktop": "playwright test --config electron/playwright.config.mjs"
   },
   "devDependencies": {
+    "@electron/packager": "20.3.0",
     "@emotion/babel-plugin": "^11.13.5",
     "@locator/babel-jsx": "^0.5.1",
     "@locator/runtime": "^0.5.1",

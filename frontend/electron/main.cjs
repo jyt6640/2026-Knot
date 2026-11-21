@@ -1,8 +1,19 @@
-const { app, BrowserWindow, dialog, ipcMain, session } = require("electron");
+const {
+  app,
+  BrowserWindow,
+  dialog,
+  ipcMain,
+  session,
+  systemPreferences,
+} = require("electron");
 const path = require("node:path");
 
 // The release build supplies its own deployed Knot origin. Local development uses webpack.
-const entry = new URL(process.env.KNOT_DESKTOP_URL ?? "http://localhost:3000");
+const entry = new URL(
+  app.isPackaged
+    ? require("./package.json").knotDesktopUrl
+    : (process.env.KNOT_DESKTOP_URL ?? "http://localhost:3000"),
+);
 const local = ["localhost", "127.0.0.1", "[::1]"].includes(entry.hostname);
 if (
   entry.protocol !== "https:" &&
@@ -34,6 +45,17 @@ function trusted(event) {
     new URL(frame.url).origin === entry.origin
   );
 }
+
+ipcMain.handle("microphone:request", async (event) => {
+  if (process.platform !== "darwin" || !trusted(event))
+    throw new Error("Microphone request outside the Knot window");
+
+  const status = systemPreferences.getMediaAccessStatus("microphone");
+  if (status !== "not-determined") return status;
+  return (await systemPreferences.askForMediaAccess("microphone"))
+    ? "granted"
+    : "denied";
+});
 
 ipcMain.on("recording:state", (event, state) => {
   if (!trusted(event)) return;

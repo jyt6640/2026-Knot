@@ -1,0 +1,42 @@
+name: macOS 녹음 권한 E2E
+
+on:
+  pull_request:
+    paths:
+      - frontend/electron/**
+      - frontend/src/shared/store/recordingStore/**
+      - frontend/src/shared/hooks/domain/recording/useMicrophoneUnavailableDialog/**
+      - frontend/src/modules/widgets/workspace/WorkspaceDock/**
+      - frontend/pnpm-lock.yaml
+      - frontend/package.json
+      - .github/workflows/macos-microphone.yml
+
+permissions:
+  contents: read
+
+jobs:
+  packaged-microphone:
+    runs-on: macos-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm package:mac
+        env:
+          KNOT_DESKTOP_URL: https://localhost:3182
+      - name: 패키징한 Knot에서 녹음과 권한 확인
+        run: |
+          bundle="$PWD/dist-desktop/Knot-darwin-$(node -p 'process.arch')/Knot.app"
+          codesign --verify --deep --strict "$bundle"
+          KNOT_TEST_APP="$bundle" pnpm test:desktop

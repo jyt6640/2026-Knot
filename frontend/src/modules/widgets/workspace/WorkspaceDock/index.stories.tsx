@@ -373,6 +373,41 @@ export const MicrophoneUnavailable: Story = {
   },
 };
 
+function macMicrophoneStory(
+  status: "granted" | "denied" | "restricted",
+): Story {
+  return {
+    ...MicrophoneUnavailable,
+    parameters: {
+      docs: ISOLATED_DOCS,
+      design: {
+        type: "figma",
+        url: "https://www.figma.com/design/i3I7Ak0XIqsbIf9cNreBeD/knot?node-id=8004-48772",
+      },
+    },
+    beforeEach: () => {
+      const previous = window.knotDesktop;
+      window.knotDesktop = {
+        requestMicrophoneAccess: async () => status,
+        setRecording: () => {},
+        onFinish: () => () => {},
+      };
+      const mic = spyOn(
+        navigator.mediaDevices,
+        "getUserMedia",
+      ).mockRejectedValue(new DOMException("", "NotFoundError"));
+      return () => {
+        mic.mockRestore();
+        window.knotDesktop = previous;
+      };
+    },
+  };
+}
+
+export const MacPermissionDenied = macMicrophoneStory("denied");
+export const MacMicrophoneMissing = macMicrophoneStory("granted");
+export const MacPermissionRestricted = macMicrophoneStory("restricted");
+
 /**
  * 회의 녹음을 눌렀지만 서버가 녹음 시작을 거절한 상태예요. 마이크를 끄고 모달로 알린 뒤 지금 화면에 남아요.
  * 예: 다른 탭에서 이미 녹음 중인 사용자
