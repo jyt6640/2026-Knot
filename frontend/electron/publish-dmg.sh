@@ -7,7 +7,7 @@ arm_hash=${2:?Apple Silicon QA SHA-256}
 intel_hash=${3:?Intel QA SHA-256}
 [[ "$version" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]
 [[ "$arm_hash" =~ ^[a-f0-9]{64}$ && "$intel_hash" =~ ^[a-f0-9]{64}$ ]]
-tag="mac-v$version"
+tag="v$version"
 arm="Knot-$version-arm64.dmg"
 intel="Knot-$version-x64.dmg"
 release=$(gh release view "$tag" -R "$repo" --json databaseId,isDraft,assets)

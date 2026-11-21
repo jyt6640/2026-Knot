@@ -65,7 +65,7 @@ test("두 QA 해시가 일치하면 초안을 한 번 공개하고 같은 버전
     "publish",
     ...names.map(
       (name) =>
-        "https://github.com/jyt6640/2026-Knot/releases/download/mac-v1.0.0/" +
+        "https://github.com/jyt6640/2026-Knot/releases/download/v1.0.0/" +
         name,
     ),
   ]);
