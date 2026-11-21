@@ -30,5 +30,8 @@ codesign --verify --deep --strict "$app"
 if [[ ${KNOT_MAC_RELEASE:-0} == 1 ]]; then
   spctl --assess --type execute --verbose "$app"
 elif [[ $(uname -m) == "$cpu" ]]; then
-  KNOT_TEST_APP="$app" pnpm test:desktop
+  node electron/check-preview-launch.mjs "$app/Contents/MacOS/Knot" "$work/profile"
+  if [[ ${KNOT_MAC_PREVIEW:-0} != 1 ]]; then
+    KNOT_TEST_APP="$app" pnpm test:desktop
+  fi
 fi

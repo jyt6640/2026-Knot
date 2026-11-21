@@ -21,6 +21,14 @@ on:
         required: true
         type: string
 
+      signing:
+        description: "배포 유형 (preview는 Apple 공증 없음)"
+        type: choice
+        default: notarized
+        options:
+          - notarized
+          - preview
+
 permissions:
   contents: read
 
@@ -53,9 +61,10 @@ jobs:
         with:
           name: release-notes
           path: ${{ runner.temp }}/notes.md
-      - name: 운영 서명·공증 설정 확인
+      - name: 배포 설정 확인
         if: github.event_name == 'workflow_dispatch'
         env:
+          SIGNING: ${{ inputs.signing }}
           MAC_CERT_P12: ${{ secrets.MAC_CERT_P12 }}
           MAC_CERT_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
           MAC_NOTARY_KEY_P8: ${{ secrets.MAC_NOTARY_KEY_P8 }}
@@ -63,8 +72,12 @@ jobs:
           MAC_NOTARY_ISSUER: ${{ secrets.MAC_NOTARY_ISSUER }}
           KNOT_DESKTOP_URL: ${{ vars.KNOT_DESKTOP_URL }}
         run: |
+          required=(KNOT_DESKTOP_URL)
+          if [[ "$SIGNING" == notarized ]]; then
+            required+=(MAC_CERT_P12 MAC_CERT_PASSWORD MAC_NOTARY_KEY_P8 MAC_NOTARY_KEY_ID MAC_NOTARY_ISSUER)
+          fi
           missing=()
-          for name in MAC_CERT_P12 MAC_CERT_PASSWORD MAC_NOTARY_KEY_P8 MAC_NOTARY_KEY_ID MAC_NOTARY_ISSUER KNOT_DESKTOP_URL; do
+          for name in "${required[@]}"; do
             [[ -n "${!name}" ]] || missing+=("$name")
           done
           if (( ${#missing[@]} )); then
@@ -90,7 +103,8 @@ jobs:
     env:
       KNOT_MAC_ARCH: ${{ matrix.arch }}
       KNOT_MAC_VERSION: ${{ github.event_name == 'workflow_dispatch' && needs.prepare.outputs.version || '0.0.0' }}
-      KNOT_MAC_RELEASE: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
+      KNOT_MAC_RELEASE: ${{ github.event_name == 'workflow_dispatch' && inputs.signing == 'notarized' && '1' || '0' }}
+      KNOT_MAC_PREVIEW: ${{ github.event_name == 'workflow_dispatch' && inputs.signing == 'preview' && '1' || '0' }}
       KNOT_NOTARY_PROFILE: knot-notary
     steps:
       - uses: actions/checkout@v6
@@ -107,13 +121,13 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: node --test electron/publish-dmg.test.mjs
       - name: Developer ID 인증서 가져오기
-        if: github.event_name == 'workflow_dispatch'
+        if: env.KNOT_MAC_RELEASE == '1'
         uses: apple-actions/import-codesign-certs@63fff01cd422d4b7b855d40ca1e9d34d2de9427d
         with:
           p12-file-base64: ${{ secrets.MAC_CERT_P12 }}
           p12-password: ${{ secrets.MAC_CERT_PASSWORD }}
       - name: 배포 서명과 공증 준비
-        if: github.event_name == 'workflow_dispatch'
+        if: env.KNOT_MAC_RELEASE == '1'
         env:
           NOTARY_KEY: ${{ secrets.MAC_NOTARY_KEY_P8 }}
           KEY_ID: ${{ secrets.MAC_NOTARY_KEY_ID }}
@@ -133,7 +147,7 @@ jobs:
           RELEASE_URL: ${{ vars.KNOT_DESKTOP_URL }}
         run: |
           [[ $(node -p 'process.arch') == "$KNOT_MAC_ARCH" ]]
-          if [[ "$KNOT_MAC_RELEASE" == 1 ]]; then
+          if [[ "$KNOT_MAC_RELEASE" == 1 || "$KNOT_MAC_PREVIEW" == 1 ]]; then
             export KNOT_DESKTOP_URL="${RELEASE_URL:?운영 Knot HTTPS 주소를 지정하세요}"
             export KNOT_DESKTOP_API_URL="$RELEASE_API_URL"
             suffix=""
@@ -160,6 +174,7 @@ jobs:
     env:
       VERSION: ${{ needs.prepare.outputs.version }}
       TITLE: ${{ needs.prepare.outputs.title }}
+      SIGNING: ${{ inputs.signing }}
       GH_TOKEN: ${{ github.token }}
       GH_REPO: ${{ github.repository }}
     steps:
@@ -188,4 +203,17 @@ jobs:
             sha256sum "$arm" "$intel"
             echo '```'
           } >> notes.md
-          gh release create "$tag" "$arm" "$intel" --target "$GITHUB_SHA" --draft --title "$TITLE" --notes-file notes.md
+          release_flags=(--draft)
+          if [[ "$SIGNING" == preview ]]; then
+            release_flags+=(--prerelease)
+            TITLE="$TITLE (macOS Preview)"
+            {
+              echo '> **macOS Preview** · 앱은 ad-hoc 서명되었으며 Apple Developer ID 서명과 공증은 없습니다.'
+              echo '> 다운로드한 앱의 첫 실행을 macOS Gatekeeper가 차단할 수 있습니다.'
+              echo '> [Apple의 macOS 앱 열기 안내](https://support.apple.com/102445)'
+              echo
+              cat notes.md
+            } > preview-notes.md
+            mv preview-notes.md notes.md
+          fi
+          gh release create "$tag" "$arm" "$intel" --target "$GITHUB_SHA" "${release_flags[@]}" --title "$TITLE" --notes-file notes.md
