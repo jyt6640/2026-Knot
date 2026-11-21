@@ -18,7 +18,9 @@ public record RecordingAudioSaveResponse(
         String failureCode,
         boolean canRetry,
         Long jobId,
-        String quality
+        String quality,
+        boolean uploadRecoverySupported,
+        Long expectedTotalFrameCount
 ) {
 
     public static RecordingAudioSaveResponse from(RecordingAudioSaveResult result) {
@@ -35,7 +37,9 @@ public record RecordingAudioSaveResponse(
                 result.failureCode(),
                 result.canRetry(),
                 result.jobId(),
-                result.quality()
+                result.quality(),
+                result.uploadRecoverySupported(),
+                result.expectedTotalFrameCount()
         );
     }
 }

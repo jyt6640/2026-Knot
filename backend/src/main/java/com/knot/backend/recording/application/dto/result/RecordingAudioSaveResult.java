@@ -16,7 +16,9 @@ public record RecordingAudioSaveResult(
         String failureCode,
         boolean canRetry,
         Long jobId,
-        String quality
+        String quality,
+        boolean uploadRecoverySupported,
+        Long expectedTotalFrameCount
 ) {
     public RecordingAudioSaveResult {
         verifiedRanges = List.copyOf(verifiedRanges);

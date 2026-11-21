@@ -361,6 +361,9 @@ public class RecordingAudioFinalizationTransaction {
             boolean missing,
             java.time.Instant observedAt
     ) {
+        if (stream.isUploadRecoverySupported()) {
+            return missing || !stream.hasReservedRecoveryEnd();
+        }
         if (stream.getSealKind() != RecordingAudioSealKind.NORMAL && clock.instant()
                 .isBefore(stream.getAcceptUntil())) {
             return true;

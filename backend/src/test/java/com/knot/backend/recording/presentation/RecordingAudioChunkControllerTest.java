@@ -271,6 +271,8 @@ class RecordingAudioChunkControllerTest {
                         null,
                         false,
                         null,
+                        null,
+                        false,
                         null
                 )
         );

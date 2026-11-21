@@ -15,6 +15,62 @@ class RecordingAudioStreamTest {
             .encodeToString(new byte[32]);
 
     @Test
+    @DisplayName("타임아웃 뒤에도 선언한 끝점까지만 복구하고 같은 선언은 재사용한다")
+    void declareRecoveryEnd_success_replayedAfterTimeout() {
+        RecordingAudioStream stream = RecordingAudioStream.create(
+                1,
+                true
+        );
+        stream.seal(
+                RecordingAudioSealKind.TIMEOUT,
+                java.time.Instant.EPOCH
+        );
+        stream.declareRecoveryEnd(
+                1,
+                2
+        );
+        stream.declareRecoveryEnd(
+                1,
+                2
+        );
+
+        assertThat(stream.isTailUnknown()).isFalse();
+        assertThat(stream.hasReservedRecoveryEnd()).isFalse();
+        assertThat(
+                catchThrowable(
+                        () -> stream.reserveRecovery(
+                                new AudioChunkDescriptor(
+                                        1,
+                                        0,
+                                        1,
+                                        2,
+                                        HASH
+                                )
+                        )
+                )
+        ).isInstanceOf(RecordingException.class);
+        assertThat(stream.getLastSequence()).isZero();
+        stream.reserveRecovery(
+                new AudioChunkDescriptor(
+                        1,
+                        0,
+                        2,
+                        4,
+                        HASH
+                )
+        );
+        assertThat(stream.hasReservedRecoveryEnd()).isTrue();
+        assertThat(
+                catchThrowable(
+                        () -> stream.declareRecoveryEnd(
+                                2,
+                                4
+                        )
+                )
+        ).isInstanceOf(RecordingException.class);
+    }
+
+    @Test
     @DisplayName("연속 번호와 offset의 조각을 등록하면 다음 위치를 전진한다")
     void reserve_success() {
         // given

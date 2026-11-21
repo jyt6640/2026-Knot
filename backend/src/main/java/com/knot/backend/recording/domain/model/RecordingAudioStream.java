@@ -48,6 +48,15 @@ public class RecordingAudioStream {
     @Column(name = "tail_unknown", nullable = false)
     private boolean tailUnknown;
 
+    @Column(name = "upload_recovery_supported", nullable = false)
+    private boolean uploadRecoverySupported;
+
+    @Column(name = "recovery_last_sequence")
+    private Integer recoveryLastSequence;
+
+    @Column(name = "recovery_total_frames")
+    private Long recoveryTotalFrames;
+
     protected RecordingAudioStream() {}
 
     private RecordingAudioStream(long recordingId) {
@@ -59,7 +68,19 @@ public class RecordingAudioStream {
     }
 
     public static RecordingAudioStream create(long recordingId) {
-        return new RecordingAudioStream(recordingId);
+        return create(
+                recordingId,
+                false
+        );
+    }
+
+    public static RecordingAudioStream create(
+            long recordingId,
+            boolean recoverySupported
+    ) {
+        RecordingAudioStream stream = new RecordingAudioStream(recordingId);
+        stream.uploadRecoverySupported = recoverySupported;
+        return stream;
     }
 
     public void reserve(AudioChunkDescriptor descriptor) {
@@ -67,6 +88,20 @@ public class RecordingAudioStream {
         if (isSealed()) {
             throw new RecordingException(RecordingErrorCode.AUDIO_SEAL_CONFLICT);
         }
+        append(descriptor);
+    }
+
+    public void reserveRecovery(AudioChunkDescriptor descriptor) {
+        validateRecoveryDeclared();
+        validateNotFrozen();
+        validateRemainingFrames(
+                recoveryLastSequence - (long) descriptor.sequence(),
+                recoveryTotalFrames - descriptor.sampleOffset() - descriptor.frameCount()
+        );
+        append(descriptor);
+    }
+
+    private void append(AudioChunkDescriptor descriptor) {
         if (descriptor == null) {
             throw new RecordingException(RecordingErrorCode.INVALID_AUDIO_CHUNK);
         }
@@ -120,6 +155,76 @@ public class RecordingAudioStream {
         sealedAt = endedAt;
         acceptUntil = endedAt.plus(Duration.ofSeconds(120));
         tailUnknown = kind != RecordingAudioSealKind.NORMAL;
+        if (uploadRecoverySupported && kind == RecordingAudioSealKind.NORMAL) {
+            declareRecoveryEnd(
+                    getLastSequence(),
+                    totalFrameCount
+            );
+        }
+    }
+
+    public void declareRecoveryEnd(
+            int lastSequence,
+            long totalFrames
+    ) {
+        validateRecoverySupported();
+        if (recoveryLastSequence != null) {
+            validateSameRecoveryEnd(
+                    lastSequence,
+                    totalFrames
+            );
+            return;
+        }
+        validateNotFrozen();
+        if (totalFrames < 0 || totalFrames > AudioChunkDescriptor.MAX_TOTAL_FRAME_COUNT) {
+            throw new RecordingException(RecordingErrorCode.INVALID_AUDIO_SEAL);
+        }
+        validateRemainingFrames(
+                (long) lastSequence - getLastSequence(),
+                totalFrames - totalFrameCount
+        );
+        recoveryLastSequence = lastSequence;
+        recoveryTotalFrames = totalFrames;
+    }
+
+    private void validateSameRecoveryEnd(
+            int lastSequence,
+            long totalFrames
+    ) {
+        if (recoveryLastSequence != lastSequence || recoveryTotalFrames != totalFrames) {
+            throw new RecordingException(RecordingErrorCode.AUDIO_SEAL_CONFLICT);
+        }
+    }
+
+    private void validateRemainingFrames(
+            long chunks,
+            long frames
+    ) {
+        if (chunks < 0 || frames < chunks || frames > chunks * AudioChunkDescriptor.MAX_FRAME_COUNT) {
+            throw new RecordingException(RecordingErrorCode.AUDIO_SEAL_CONFLICT);
+        }
+    }
+
+    private void validateRecoverySupported() {
+        if (!uploadRecoverySupported || !isSealed()) {
+            throw new RecordingException(RecordingErrorCode.AUDIO_SEAL_CONFLICT);
+        }
+    }
+
+    public void validateRecoveryDeclared() {
+        validateRecoverySupported();
+        if (recoveryLastSequence == null) {
+            throw new RecordingException(RecordingErrorCode.AUDIO_SEAL_CONFLICT);
+        }
+    }
+
+    public boolean hasReservedRecoveryEnd() {
+        return recoveryLastSequence != null && recoveryLastSequence == getLastSequence()
+                && recoveryTotalFrames == totalFrameCount;
+    }
+
+    public boolean isTailUnknown() {
+        return tailUnknown && recoveryLastSequence == null;
     }
 
     public void validateNormalSeal(
