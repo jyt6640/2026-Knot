@@ -1,0 +1,133 @@
+name: macOS DMG
+on:
+  pull_request:
+    paths:
+      - frontend/electron/**
+      - frontend/package.json
+      - frontend/pnpm-lock.yaml
+      - .github/workflows/macos-dmg.yml
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "검증할 릴리스 후보 버전 (예: 1.0.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  dmg:
+    if: github.event_name == 'pull_request' || github.ref_name == github.event.repository.default_branch
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm64
+            runner: macos-15
+          - arch: x64
+            runner: macos-15-intel
+    runs-on: ${{ matrix.runner }}
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      KNOT_MAC_ARCH: ${{ matrix.arch }}
+      KNOT_MAC_VERSION: ${{ inputs.version || '0.0.0' }}
+      KNOT_MAC_RELEASE: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
+      KNOT_NOTARY_PROFILE: knot-notary
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: node --test electron/publish-dmg.test.mjs
+      - name: Developer ID 인증서 가져오기
+        if: github.event_name == 'workflow_dispatch'
+        uses: apple-actions/import-codesign-certs@63fff01cd422d4b7b855d40ca1e9d34d2de9427d
+        with:
+          p12-file-base64: ${{ secrets.MAC_CERT_P12 }}
+          p12-password: ${{ secrets.MAC_CERT_PASSWORD }}
+      - name: 배포 서명과 공증 준비
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          NOTARY_KEY: ${{ secrets.MAC_NOTARY_KEY_P8 }}
+          KEY_ID: ${{ secrets.MAC_NOTARY_KEY_ID }}
+          ISSUER: ${{ secrets.MAC_NOTARY_ISSUER }}
+        run: |
+          identity=$(security find-identity -v -p codesigning | awk '/"Developer ID Application:/ { print $2 }')
+          [[ "$identity" =~ ^[A-F0-9]{40}$ ]]
+          echo "KNOT_SIGN_IDENTITY=$identity" >> "$GITHUB_ENV"
+          umask 077
+          key=$(mktemp)
+          trap 'rm -f "$key"' EXIT
+          printf '%s' "$NOTARY_KEY" > "$key"
+          xcrun notarytool store-credentials "$KNOT_NOTARY_PROFILE" --key "$key" --key-id "$KEY_ID" --issuer "$ISSUER"
+      - name: DMG 생성 및 설치 검증
+        env:
+          RELEASE_URL: ${{ vars.KNOT_DESKTOP_URL }}
+        run: |
+          [[ $(node -p 'process.arch') == "$KNOT_MAC_ARCH" ]]
+          if [[ "$KNOT_MAC_RELEASE" == 1 ]]; then
+            export KNOT_DESKTOP_URL="${RELEASE_URL:?운영 Knot HTTPS 주소를 지정하세요}"
+            suffix=""
+          else
+            export KNOT_DESKTOP_URL=https://localhost:3182
+            suffix="-test"
+          fi
+          bash electron/build-dmg.sh
+          bash electron/test-dmg.sh "dist-desktop/Knot-$KNOT_MAC_VERSION-$KNOT_MAC_ARCH$suffix.dmg"
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch'
+        with:
+          name: dmg-${{ matrix.arch }}
+          path: frontend/dist-desktop/Knot-${{ inputs.version }}-${{ matrix.arch }}.dmg
+          if-no-files-found: error
+
+  candidate:
+    if: github.event_name == 'workflow_dispatch'
+    concurrency: macos-release-${{ inputs.version }}
+    needs: dmg
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ inputs.version }}
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: dmg-*
+          merge-multiple: true
+      - name: 동일 빌드의 두 DMG를 초안 릴리스에 첨부
+        run: |
+          tag="mac-v$VERSION"
+          arm="Knot-$VERSION-arm64.dmg"
+          intel="Knot-$VERSION-x64.dmg"
+          test -s "$arm" && test -s "$intel"
+          gh api --paginate "repos/$GH_REPO/releases" --jq '.[].tag_name' > release-tags
+          if grep -Fxq "$tag" release-tags; then echo "이미 존재하는 릴리스: $tag"; exit 1; fi
+          # Avoid attaching a candidate to a tag from a different build.
+          test "$(gh api "repos/$GH_REPO/git/matching-refs/tags/$tag" --jq "[.[] | select(.ref == \"refs/tags/$tag\")] | length")" = 0
+          cat > notes.md <<EOF
+          **설치 방법** —  → 이 Mac에 관하여에서 칩 또는 프로세서를 확인하세요.
+          - Apple M 시리즈: \`$arm\`
+          - Intel 프로세서: \`$intel\`
+
+          아래 Assets에서 맞는 DMG를 받아 열고 Knot을 Applications로 드래그하세요. 응용 프로그램에서 Knot을 열고 녹음을 처음 시작할 때 마이크를 허용하세요.
+
+          **SHA-256**
+          \`\`\`
+          $(sha256sum "$arm" "$intel")
+          \`\`\`
+          EOF
+          gh release create "$tag" "$arm" "$intel" --target "$GITHUB_SHA" --draft --title "Knot for macOS $VERSION" --notes-file notes.md
