@@ -95,7 +95,7 @@ describe("trackRecordingEnded", () => {
     },
   );
 
-  it.each(["recorder_bar", "dock", "logout", "workspace_move"] as const)(
+  it.each(["recorder_bar", "menu_bar", "dock", "logout", "workspace_move"] as const)(
     "끝낸 곳 %s를 그대로 보낸다",
     (surface) => {
       trackRecordingEnded({

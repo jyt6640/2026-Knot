@@ -7,6 +7,9 @@ on:
       - frontend/src/shared/store/recordingStore/**
       - frontend/src/shared/hooks/domain/recording/useMicrophoneUnavailableDialog/**
       - frontend/src/modules/widgets/workspace/WorkspaceDock/**
+      - frontend/src/modules/widgets/recording/RecordingMenu/**
+      - frontend/src/shared/hooks/domain/recording/useDesktopRecording/**
+      - frontend/src/App.tsx
       - frontend/pnpm-lock.yaml
       - frontend/package.json
       - .github/workflows/macos-microphone.yml

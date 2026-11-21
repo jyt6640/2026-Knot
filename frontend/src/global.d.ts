@@ -53,7 +53,20 @@ interface Window {
     requestMicrophoneAccess?(): Promise<
       "granted" | "denied" | "restricted" | "unknown"
     >;
-    setRecording(state: { id: number; phase: "active" | "saving" } | null): void;
+    recordingMenu?: {
+      subscribe(open: (id: number) => void, close: () => void): () => void;
+      ready(id: number): void;
+      returnToMain(id: number): void;
+    };
+    setRecording(
+      state: {
+        id: number;
+        phase: "active" | "saving";
+        paused: boolean;
+        saveFailed: boolean;
+        elapsedTime: string;
+      } | null,
+    ): void;
     onFinish(finish: (recordingId: number) => Promise<boolean>): () => void;
   };
 }

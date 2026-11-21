@@ -14,7 +14,7 @@ interface TrackRecordingEndedParams {
   /** 끝내기 직전까지 녹음한 시간(ms). 일시정지한 동안은 빠져요 */
   elapsedMs: number;
   /** 끝낸 곳. 녹음 바 · 독의 녹음 칩 · 로그아웃 확인 창 · 워크스페이스를 옮기기 전 확인 창이에요 */
-  surface: "recorder_bar" | "dock" | "logout" | "workspace_move";
+  surface: "recorder_bar" | "menu_bar" | "dock" | "logout" | "workspace_move";
   /** 녹음 끝내기의 결과. `useRecordingControl`의 `endRecordingWithoutConfirm`이 돌려주는 값이에요 */
   result: "uploaded" | "notUploaded" | "notEnded";
 }

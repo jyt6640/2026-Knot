@@ -57,7 +57,7 @@ interface AnalyticsEventMap {
     /** 끝낼 때까지 녹음한 시간(초, 소수 첫째 자리까지). 일시정지한 동안은 세지 않아요 */
     duration_seconds: number;
     /** 끝낸 곳. 녹음 화면의 녹음 바(`recorder_bar`) · 독의 녹음 칩(`dock`) · 로그아웃 확인 창(`logout`) · 워크스페이스를 옮기기 전 확인 창(`workspace_move`)이에요 */
-    surface: "recorder_bar" | "dock" | "logout" | "workspace_move";
+    surface: "recorder_bar" | "menu_bar" | "dock" | "logout" | "workspace_move";
     recording_id: number;
     workspace_id: number;
   };
