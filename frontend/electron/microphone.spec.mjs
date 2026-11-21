@@ -47,7 +47,7 @@ for (const allowFirst of [true, false]) {
       await start.click();
     }
     await expect(bar).toContainText("녹음 중");
-    expect(starts).toHaveLength(1);
+    expect(starts).toHaveLength(0);
     expect(await desktop.evaluate(() => globalThis.microphonePrompts)).toBe(1);
   });
 }

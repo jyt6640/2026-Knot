@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - frontend/electron/**
+      - frontend/src/pages/desktop/**
+      - frontend/src/modules/widgets/recording/RecorderBar/**
       - frontend/src/shared/store/recordingStore/**
       - frontend/src/shared/hooks/domain/recording/useMicrophoneUnavailableDialog/**
       - frontend/src/modules/widgets/workspace/WorkspaceDock/**
@@ -35,6 +37,7 @@ jobs:
           cache: pnpm
           cache-dependency-path: frontend/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
+      - run: node --test electron/local-library.test.cjs
       - run: pnpm package:mac
         env:
           KNOT_DESKTOP_URL: https://localhost:3182
