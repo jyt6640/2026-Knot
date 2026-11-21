@@ -139,6 +139,26 @@ async function expectRecordingContinues(page: Page) {
   await expect(page).toHaveURL(/\/recording$/);
 }
 
+test("[MAC-R02] 웹에서 마이크를 거부하면 브라우저 권한 안내와 녹음 시작 버튼을 유지한다", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    navigator.mediaDevices.getUserMedia = async () => {
+      throw new DOMException("Permission denied", "NotAllowedError");
+    };
+  });
+  await page.goto(HOME_PATH);
+  const start = page.getByRole("button", { name: "회의 녹음 시작" });
+  await start.click();
+  const notice = page.getByRole("alertdialog", {
+    name: "마이크 권한이 꺼져 있어요",
+  });
+  await expect(notice).toContainText("주소창");
+  await notice.getByRole("button", { name: "확인" }).click();
+  await expect(start).toBeEnabled();
+  await expect(page).toHaveURL(/\/workspace\/1$/);
+});
+
 test.describe("녹음 중 회의 소리 함께 녹음", () => {
   test("[STT-R43] 독 마이크로 시작한 녹음은 공유 창을 열지 않고 마이크만 녹음한다", async ({
     page,
