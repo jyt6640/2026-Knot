@@ -15,6 +15,29 @@ async function start(page) {
     "녹음 중",
   );
 }
+// Feed a continuous, known tone into the fake microphone stream. Chromium's
+// built-in fake device alone can emit silence during the final short block.
+async function addTestTone(page) {
+  await page.evaluate(() => {
+    const open = navigator.mediaDevices.getUserMedia.bind(
+      navigator.mediaDevices,
+    );
+    navigator.mediaDevices.getUserMedia = async (constraints) => {
+      const source = await open(constraints);
+      const context = new AudioContext();
+      const output = context.createMediaStreamDestination();
+      context.createMediaStreamSource(source).connect(output);
+      const tone = context.createOscillator();
+      tone.frequency.value = 440;
+      tone.connect(output);
+      tone.start();
+      await context.resume();
+      // Hold the graph until the isolated test renderer is closed.
+      window.testTone = { context, tone, source };
+      return output.stream;
+    };
+  });
+}
 async function finish(page) {
   await page.getByRole("button", { name: "녹음 끝내기" }).click();
   await page
@@ -37,6 +60,7 @@ test("[MAC-R01] ⌘Q 취소, 실제 SQLite 용량 부족과 마지막 블록 재
   desktop,
   home,
 }, info) => {
+  await addTestTone(home);
   await start(home);
   await desktop.evaluate(({ app, dialog }) => {
     dialog.showMessageBox = async () => ({ response: 0 });
@@ -101,6 +125,7 @@ test("[MAC-R01] 오프라인에서 시작한 회의를 ⌘Q로 저장하고 같�
     await exitApp(desktop);
     desktop = await launch(profile, true);
     const page = await desktop.firstWindow();
+    await addTestTone(page);
     await start(page);
     await expect
       .poll(
