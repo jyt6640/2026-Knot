@@ -103,6 +103,9 @@ public class RecordingService {
                         controlTokenHash
                 );
             }
+            if (command.uploadRecoverySupported() && command.audioMode() != RecordingAudioMode.PCM16_CHUNKS_V1) {
+                throw new RecordingException(RecordingErrorCode.AUDIO_MODE_CONFLICT);
+            }
             if (command.audioMode() == RecordingAudioMode.PCM16_CHUNKS_V1 && !audioChunksProperties.enabled()) {
                 throw new RecordingException(RecordingErrorCode.AUDIO_MODE_DISABLED);
             }
@@ -123,7 +126,12 @@ public class RecordingService {
             }
             RecordingSession saved = recordingSessionRepository.save(session);
             if (saved.getAudioMode() == RecordingAudioMode.PCM16_CHUNKS_V1) {
-                recordingAudioStreamRepository.save(RecordingAudioStream.create(saved.getId()));
+                recordingAudioStreamRepository.save(
+                        RecordingAudioStream.create(
+                                saved.getId(),
+                                command.uploadRecoverySupported()
+                        )
+                );
                 audioCleanup.track(
                         saved.getId(),
                         now()
@@ -687,6 +695,10 @@ public class RecordingService {
                 controlTokenHash,
                 command.audioMode()
         );
+        validateReplayRecovery(
+                session,
+                command
+        );
         RecordingStatus previous = session.getStatus();
         if (session.expireIfDue(
                 now(),
@@ -703,6 +715,23 @@ public class RecordingService {
                 session,
                 false
         );
+    }
+
+    private void validateReplayRecovery(
+            RecordingSession session,
+            RecordingStartCommand command
+    ) {
+        if (session.getAudioMode() != RecordingAudioMode.PCM16_CHUNKS_V1 && command.uploadRecoverySupported()) {
+            throw new RecordingException(RecordingErrorCode.RECORDING_START_REQUEST_CONFLICT);
+        }
+        if (session.getAudioMode() != RecordingAudioMode.PCM16_CHUNKS_V1) {
+            return;
+        }
+        RecordingAudioStream stream = recordingAudioStreamRepository.findByRecordingId(session.getId())
+                .orElseThrow(() -> new RecordingException(RecordingErrorCode.RECORDING_NOT_FOUND));
+        if (command.uploadRecoverySupported() != stream.isUploadRecoverySupported()) {
+            throw new RecordingException(RecordingErrorCode.RECORDING_START_REQUEST_CONFLICT);
+        }
     }
 
     private void releaseActiveRecordings(long memberId) {

@@ -24,7 +24,8 @@ public record RecordingStartRequest(
         String controlToken,
 
         @Schema(description = "오디오 저장 방식. 생략하면 FINAL_WEBM_V1", defaultValue = "FINAL_WEBM_V1")
-        RecordingAudioMode audioMode
+        RecordingAudioMode audioMode,
+        Boolean uploadRecoverySupported
 ) {
     // @formatter:on
 
@@ -32,6 +33,21 @@ public record RecordingStartRequest(
         audioMode = java.util.Objects.requireNonNullElse(
                 audioMode,
                 RecordingAudioMode.FINAL_WEBM_V1
+        );
+    }
+
+    public RecordingStartRequest(
+            UUID requestId,
+            UUID tabId,
+            String controlToken,
+            RecordingAudioMode audioMode
+    ) {
+        this(
+                requestId,
+                tabId,
+                controlToken,
+                audioMode,
+                false
         );
     }
 
@@ -53,7 +69,8 @@ public record RecordingStartRequest(
                 requestId,
                 tabId,
                 controlToken,
-                audioMode
+                audioMode,
+                Boolean.TRUE.equals(uploadRecoverySupported)
         );
     }
 

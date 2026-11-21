@@ -7,13 +7,29 @@ public record RecordingStartCommand(
         UUID requestId,
         UUID tabId,
         String controlToken,
-        RecordingAudioMode audioMode
+        RecordingAudioMode audioMode,
+        boolean uploadRecoverySupported
 ) {
 
     public RecordingStartCommand {
         audioMode = java.util.Objects.requireNonNullElse(
                 audioMode,
                 RecordingAudioMode.FINAL_WEBM_V1
+        );
+    }
+
+    public RecordingStartCommand(
+            UUID requestId,
+            UUID tabId,
+            String controlToken,
+            RecordingAudioMode audioMode
+    ) {
+        this(
+                requestId,
+                tabId,
+                controlToken,
+                audioMode,
+                false
         );
     }
 

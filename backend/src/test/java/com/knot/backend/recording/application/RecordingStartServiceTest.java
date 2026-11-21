@@ -450,6 +450,7 @@ class RecordingStartServiceTest {
                 )
         ).thenReturn(Optional.of(existing));
 
+        when(streamRepository.findByRecordingId(7L)).thenReturn(Optional.of(RecordingAudioStream.create(7L)));
         // when
         RecordingStartResult result = service.start(
                 WORKSPACE_ID,
@@ -464,7 +465,10 @@ class RecordingStartServiceTest {
                 recordingSessionRepository,
                 org.mockito.Mockito.never()
         ).save(any(RecordingSession.class));
-        verifyNoInteractions(streamRepository);
+        verify(
+                streamRepository,
+                org.mockito.Mockito.never()
+        ).save(any(RecordingAudioStream.class));
     }
 
     @Test
