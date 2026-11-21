@@ -80,6 +80,20 @@ export default class Microphone {
     this.errorName = null;
 
     try {
+      const requestAccess = window.knotDesktop?.requestMicrophoneAccess;
+      if (requestAccess) {
+        const status = await requestAccess();
+        if (requestedGeneration !== this.generation) return null;
+        if (status === "denied" || status === "restricted") {
+          this.errorName =
+            status === "denied"
+              ? "NotAllowedError"
+              : "MicrophoneRestrictedError";
+          return null;
+        }
+        if (status !== "granted")
+          throw new Error("macOS microphone permission unavailable");
+      }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       markRecordingStart("mic-granted");
 

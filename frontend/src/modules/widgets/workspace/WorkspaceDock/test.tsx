@@ -849,6 +849,63 @@ describe("WorkspaceDock", () => {
       expect(router.state.location.pathname).toBe(RECORDING_PATH);
     });
 
+    describe("Mac 마이크 안내", () => {
+      const stubMacPermission = (
+        status: "granted" | "denied" | "restricted",
+      ) => {
+        window.knotDesktop = {
+          requestMicrophoneAccess: async () => status,
+          setRecording: vi.fn(),
+          onFinish: () => vi.fn(),
+        };
+      };
+      afterEach(() => {
+        delete window.knotDesktop;
+      });
+
+      it.each([
+        [
+          "denied",
+          "마이크 권한이 꺼져 있어요",
+          "개인정보 보호 및 보안 → 마이크",
+        ],
+        ["restricted", "마이크 접근이 제한되어 있어요", "관리 설정"],
+      ] as const)(
+        "%s일 때 장치를 열거나 녹음을 만들지 않는다",
+        async (status, title, hint) => {
+          stubMacPermission(status);
+          const capture = vi.spyOn(navigator.mediaDevices, "getUserMedia");
+          const { router } = renderDock();
+          await clickMic();
+          expect(
+            screen.getByRole("alertdialog", { name: title }),
+          ).toHaveTextContent(hint);
+          expect(capture).not.toHaveBeenCalled();
+          expect(useRecordingStore.getState()).toMatchObject({
+            session: null,
+            status: "idle",
+            resumedAt: null,
+          });
+          expect(router.state.location.pathname).toBe(HOME_PATH);
+        },
+      );
+
+      it("권한을 허용했지만 마이크가 없으면 입력 장치 연결을 안내한다", async () => {
+        stubMacPermission("granted");
+        vi.spyOn(navigator.mediaDevices, "getUserMedia").mockRejectedValueOnce(
+          new DOMException("", "NotFoundError"),
+        );
+        renderDock();
+        await clickMic();
+        expect(
+          screen.getByRole("alertdialog", {
+            name: "연결된 마이크를 찾을 수 없어요",
+          }),
+        ).toHaveTextContent("사운드 → 입력");
+        expect(useRecordingStore.getState().session).toBeNull();
+      });
+    });
+
     it("녹음 화면에서는 마이크를 숨긴다", () => {
       renderDock(RECORDING_PATH);
 

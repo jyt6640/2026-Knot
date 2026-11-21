@@ -5,6 +5,9 @@ const origin = process.argv
   ?.slice(14);
 if (process.isMainFrame && location.origin === origin) {
   contextBridge.exposeInMainWorld("knotDesktop", {
+    ...(process.platform === "darwin" && {
+      requestMicrophoneAccess: () => ipcRenderer.invoke("microphone:request"),
+    }),
     setRecording: (state) => ipcRenderer.send("recording:state", state),
     onFinish: (finish) => {
       const listener = async (_event, id) => {

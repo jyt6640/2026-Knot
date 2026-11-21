@@ -18,6 +18,7 @@ node_modules
 .pnp.*
 
 dist/
+dist-desktop/
 
 .env
 .env.development

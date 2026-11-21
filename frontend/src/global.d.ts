@@ -50,6 +50,9 @@ declare function registerProcessor(
 
 interface Window {
   knotDesktop?: {
+    requestMicrophoneAccess?(): Promise<
+      "granted" | "denied" | "restricted" | "unknown"
+    >;
     setRecording(state: { id: number; phase: "active" | "saving" } | null): void;
     onFinish(finish: (recordingId: number) => Promise<boolean>): () => void;
   };
