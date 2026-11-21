@@ -16,7 +16,7 @@ import { formatRecordingTime } from "@utils/formatRecordingTime";
  */
 export const useRecorderBar = () => {
   const { openMicrophoneUnavailableDialog } = useMicrophoneUnavailableDialog();
-  const { status, analyser, isEnding } = useRecordingState();
+  const { status, analyser, isEnding, desktopSaveFailed } = useRecordingState();
   const { elapsedSeconds } = useRecordingElapsedTime();
   const {
     status: serverStatus,
@@ -53,6 +53,7 @@ export const useRecorderBar = () => {
       : formatRecordingTime(elapsedSeconds),
     analyser,
     isEnding,
+    desktopSaveFailed,
     handlePause: () => void pauseRecording(),
     handleResume,
     handleEnd: () => void endRecording("recorder_bar"),

@@ -35,7 +35,10 @@ const useRecordingState = () => {
     (state) => state.isChunkArchiveFailed,
   );
 
+  const desktopSaveFailed = useRecordingStore((state) => state.desktopSaveFailed);
+
   return {
+    desktopSaveFailed,
     status,
     session,
     isRecordingActive: status !== "idle",

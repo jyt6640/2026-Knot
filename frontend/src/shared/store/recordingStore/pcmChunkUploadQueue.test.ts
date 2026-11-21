@@ -730,3 +730,20 @@ describe("PcmChunkUploadQueue", () => {
     });
   });
 });
+
+it("Mac 종료 재시도는 이미 실패한 조각도 같은 번호·오프셋·바이트로 확인한다", async () => {
+  const pending = silentPcm(16);
+  const reserve = vi.fn()
+    .mockRejectedValueOnce(new Error("예약 거절"))
+    .mockResolvedValue({ status: "RESERVED", uploadUrl: "https://example.test/audio", requiredHeaders: {} });
+  const upload = vi.fn(async () => {});
+  const queue = new PcmChunkUploadQueue({
+    reserve, upload,
+    complete: async () => ({ status: "VERIFIED", verifiedThroughSequence: 1, verifiedThroughFrame: 16 }),
+  });
+  await expect(queue.enqueue(pending)).rejects.toThrow("예약 거절");
+  await queue.verifyAll();
+  expect(reserve.mock.calls[1]).toEqual(reserve.mock.calls[0]);
+  expect(upload).toHaveBeenCalledWith(expect.objectContaining({ pcm: pending }));
+  expect(queue.pendingSequences).toEqual([]);
+});

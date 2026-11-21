@@ -35,6 +35,7 @@ import {
   type PcmAudioSeal,
   type PcmChunkRequests,
 } from "@store/recordingStore/pcmChunkUploadQueue";
+import { DesktopRecordingSave } from "@store/recordingStore/desktopSave";
 import { UnsupportedPcmCollectorError } from "@store/recordingStore/pcmCollector";
 import {
   deleteRecordingChunks,
@@ -130,6 +131,7 @@ const wait = (ms: number) =>
  * PCM 녹음의 일시정지·이어서 녹음을 순서대로 처리하는 사슬. 봉인과 서버 응답을 기다리는 동안 연타가 겹치지 않게 해요.
  * 훅을 쓰는 화면(독·녹음 바)이 여럿이라 모듈에 둬요
  */
+let desktopSave: DesktopRecordingSave | undefined;
 let pcmControlChain: Promise<unknown> = Promise.resolve();
 
 // Babel 8은 .ts에서도 JSX를 켜서 `<T>(…) =>`를 태그로 읽으니 function 선언으로 둬요
@@ -322,6 +324,49 @@ const useRecordingControl = () => {
     [completeAudioUpload, issueAudioUploadUrl, show, uploadAudio],
   );
 
+  const endDesktopRecording = useCallback(async (serverEnded = false) => {
+    const store = useRecordingStore.getState();
+    const { session } = store;
+    if (!session) return false;
+    if (!desktopSave) {
+      const proof = getRecordingControlProof();
+      if (!proof) return false;
+      store.beginEnding();
+      desktopSave = new DesktopRecordingSave({
+        recordingId: session.recordingId,
+        stop: () => runInOrder(store.stopRecording),
+        verifyChunks: session.audioMode === "PCM16_CHUNKS_V1" ? store.verifyDesktopChunks : undefined,
+        end: async (audioSeal) => {
+          if (serverEnded) return;
+          try {
+            await endRecordingSession({ ...session, ...proof, audioSeal });
+          } catch (error) {
+            // 종료 응답만 유실됐으면 같은 세션의 종료 상태를 확인한 뒤 이어간다.
+            if (!isHttpError(error) || error.code !== "RECORDING_ALREADY_ENDED") throw error;
+            const recording = await getRecordingApi(session);
+            if (recording.sessionStatus !== "ENDED") throw error;
+          }
+        },
+        uploadFile: (audio) => uploadRecordedAudio({ ...session, audio }),
+        saved: () => {
+          desktopSave = undefined;
+          clearRecording(session.workspaceId);
+        },
+      });
+    }
+    if (desktopSave.steps.recordingId !== session.recordingId) return false;
+    useRecordingStore.setState({ desktopSaveFailed: false });
+    try {
+      const saved = await desktopSave.run();
+      if (!saved) useRecordingStore.setState({ desktopSaveFailed: true });
+      return saved;
+    } catch (error) {
+      useRecordingStore.setState({ desktopSaveFailed: true });
+      logRequestError({ feature: "recording", action: "Mac 녹음 저장", error });
+      return false;
+    }
+  }, [clearRecording, endRecordingSession, uploadRecordedAudio]);
+
   /**
    * 생존 신호를 보내고 응답의 서버 상태에 맞춰 녹음을 이어 가거나 닫아요.
    * 실패는 다시 보내지 않고 다음 신호를 부르는 쪽의 주기에 맡겨요. 콘솔에는 실패마다, Sentry에는 연속 실패의 첫 번째만 남겨요
@@ -355,6 +400,12 @@ const useRecordingControl = () => {
 
       const isConnectionExpired = endReason === "CONNECTION_EXPIRED";
 
+      if (status === "ENDED" && window.knotDesktop) {
+        const saved = await endDesktopRecording(true);
+        if (saved) navigateToWorkspaceHome({ workspaceId: String(session.workspaceId), replace: true });
+        countRecordingEnd({ session, reason: toServerEndCause(endReason), isUploaded: saved });
+        return;
+      }
       if (status === "ENDED" && session.audioMode === "PCM16_CHUNKS_V1") {
         const unsentChunkCount = useRecordingStore
           .getState()
@@ -431,6 +482,8 @@ const useRecordingControl = () => {
     }
   }, [
     closeRecording,
+    endDesktopRecording,
+    navigateToWorkspaceHome,
     queryClient,
     sendRecordingHeartbeat,
     show,
@@ -939,6 +992,7 @@ const useRecordingControl = () => {
    * `notEnded`는 이미 끝내는 중이거나 종료 요청이 실패해 녹음을 이어 가는 경우예요
    */
   const endAndUploadRecording = useCallback(async () => {
+    if (window.knotDesktop) return (await endDesktopRecording()) ? "uploaded" : "notEnded";
     const { session, isEnding, beginEnding } = useRecordingStore.getState();
     const proof = getRecordingControlProof();
     if (!session || !proof || isEnding) return "notEnded";
@@ -975,6 +1029,7 @@ const useRecordingControl = () => {
     return isUploaded ? "uploaded" : "notUploaded";
   }, [
     clearRecording,
+    endDesktopRecording,
     endPcmRecording,
     endRecordingSession,
     show,
@@ -1001,38 +1056,37 @@ const useRecordingControl = () => {
     useRecordingEndedAnalytics(endAndCountRecording);
 
   const endRecording = useCallback((surface: RecordingEndSurface) => {
-    // 끝내는 동안 다시 눌러도 이미 끝내는 중이라 확인 창을 또 띄우지 않아요
-    if (useRecordingStore.getState().isEnding) return;
+    const { isEnding, desktopSaveFailed } = useRecordingStore.getState();
+    if (isEnding && !desktopSaveFailed) return;
+    const finish = async () => {
+      // 새로고침 뒤 이어 받기 전이면 보관한 소리를 올릴 수 있게 먼저 이어 받아요
+      if (
+        useRecordingStore.getState().status === "idle" &&
+        (await reconnectAndTrackRecording("end_dialog")) !== "reconnected"
+      ) {
+        return;
+      }
 
-    openEndRecordingDialog({
-      onEnd: async () => {
-        // 새로고침 뒤 이어 받기 전이면 보관한 소리를 올릴 수 있게 먼저 이어 받아요
-        if (
-          useRecordingStore.getState().status === "idle" &&
-          (await reconnectAndTrackRecording("end_dialog")) !== "reconnected"
-        ) {
-          return;
-        }
+      const { session } = useRecordingStore.getState();
+      if (!session) return;
 
-        const { session } = useRecordingStore.getState();
-        if (!session) return;
+      const result = await endRecordingWithoutConfirm(surface);
+      if (result === "notEnded") return;
 
-        const result = await endRecordingWithoutConfirm(surface);
-        if (result === "notEnded") return;
-
-        const workspaceId = String(session.workspaceId);
-        // 올린 오디오가 있어야 문서가 만들어지므로, 올리지 못한 녹음은 정리 화면 대신 홈으로 보내요
-        if (result === "uploaded") {
-          navigateToRecordingDocuments({
-            workspaceId,
-            recordingId: session.recordingId,
-            replace: true,
-          });
-        } else {
-          navigateToWorkspaceHome({ workspaceId, replace: true });
-        }
-      },
-    });
+      const workspaceId = String(session.workspaceId);
+      // 올린 오디오가 있어야 문서가 만들어지므로, 올리지 못한 녹음은 정리 화면 대신 홈으로 보내요
+      if (result === "uploaded") {
+        navigateToRecordingDocuments({
+          workspaceId,
+          recordingId: session.recordingId,
+          replace: true,
+        });
+      } else {
+        navigateToWorkspaceHome({ workspaceId, replace: true });
+      }
+    };
+    if (desktopSaveFailed) void finish();
+    else openEndRecordingDialog({ onEnd: finish });
   }, [
     endRecordingWithoutConfirm,
     navigateToRecordingDocuments,
@@ -1050,6 +1104,7 @@ const useRecordingControl = () => {
     sendHeartbeat,
     endRecording,
     endRecordingWithoutConfirm,
+    endDesktopRecording,
   };
 };
 

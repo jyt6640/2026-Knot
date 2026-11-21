@@ -159,7 +159,7 @@ export default class PcmChunkUploadQueue {
   /** 일시 실패가 이어져 조각이 밀리고 있는지 */
   private isStalled = false;
   /** 저장 확인 전까지 들고 있는 조각 */
-  private readonly pending = new Map<number, ArrayBuffer>();
+  private readonly pending = new Map<number, SealedPcmChunk>();
   /** 예약 응답을 아직 받지 못한 조각의 descriptor. 해시를 전송 직전에 계산해 붙이므로 Promise로 들고 있어요 */
   private readonly unreserved = new Map<number, Promise<PcmChunkDescriptor>>();
   /** 예약을 순서대로 하나씩 보내는 사슬. 앞 예약이 멈추면 거부된 채 남아 뒤 예약도 함께 멈춰요 */
@@ -226,10 +226,27 @@ export default class PcmChunkUploadQueue {
     this.nextSampleOffset += frameCount;
     // 멈춘 뒤에 들어온 조각은 올릴 수 없어 들고 있지 않아요
     if (!this.stopReason) {
-      this.pending.set(chunk.sequence, pcm);
+      this.pending.set(chunk.sequence, chunk);
       this.archive?.save(chunk.sequence, pcm).catch(() => this.onArchiveFailed?.());
     }
 
+    return this.schedule(chunk);
+  }
+
+  /** 마지막 조각까지 저장 확인을 기다리고, 이전 시도에서 멈춘 조각은 같은 번호로 재예약해요. */
+  async verifyAll() {
+    await this.drain().catch(() => undefined);
+    if (this.pending.size > 0) {
+      this.assertRunning();
+      this.reserveChain = Promise.resolve();
+      for (const chunk of this.pending.values()) this.schedule(chunk);
+      await this.drain();
+    }
+    this.assertRunning();
+    if (this.pending.size > 0) throw new Error("오디오 저장 확인이 남았어요.");
+  }
+
+  private schedule(chunk: SealedPcmChunk) {
     const task: Promise<void> = this.transfer(chunk).finally(() => {
       this.inflight.delete(task);
     });

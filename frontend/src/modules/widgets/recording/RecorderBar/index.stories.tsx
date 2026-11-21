@@ -242,3 +242,15 @@ export const EndFailed: Story = {
     await userEvent.click(dialog.getByRole("button", { name: "녹음 끝내기" }));
   },
 };
+
+/** Mac에서 종료를 확인한 뒤 오디오 저장이 실패하면 같은 녹음을 다시 저장할 수 있어요. */
+export const DesktopSaveFailed: Story = {
+  name: "Mac · 저장 실패 후 재시도",
+  parameters: {
+    design: { type: "figma", url: "https://www.figma.com/design/i3I7Ak0XIqsbIf9cNreBeD/knot?node-id=8004-48803" },
+  },
+  beforeEach: () => {
+    useRecordingStore.setState({ status: "paused", isEnding: true, desktopSaveFailed: true });
+    return resetRecording;
+  },
+};

@@ -25,12 +25,15 @@ export default function RecorderBar() {
     elapsedTime,
     analyser,
     isEnding,
+    desktopSaveFailed,
     handlePause,
     handleResume,
     handleEnd,
   } = useRecorderBar();
 
   const getStatusLabel = () => {
+    if (desktopSaveFailed) return "저장 실패";
+    if (isEnding && window.knotDesktop) return "저장 중";
     if (isReloaded && !isReloadedWhilePaused) return "녹음 멈춤";
 
     return isPaused ? "일시정지" : "녹음 중";
@@ -85,13 +88,13 @@ export default function RecorderBar() {
         <Button
           size="md"
           variant="filled"
-          disabled={isEnding}
+          disabled={isEnding && !desktopSaveFailed}
           onClick={handleEnd}
         >
           <IconBox>
             <StopMark />
           </IconBox>
-          녹음 끝내기
+          {desktopSaveFailed ? "저장 다시 시도" : "녹음 끝내기"}
         </Button>
       </Controls>
     </Container>

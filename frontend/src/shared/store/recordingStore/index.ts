@@ -98,6 +98,7 @@ interface RecordingState {
   microphoneErrorName: string | null;
   /** 녹음을 끝내는 중인지. 종료 요청을 보낼 때부터 업로드를 마치고 녹음을 비울 때까지 `true`예요 */
   isEnding: boolean;
+  desktopSaveFailed: boolean;
   /** 끝낸 PCM 녹음의 조각을 아직 올리는 중인지. 큐가 비거나 멈추거나 시한이 지나면 `false`가 돼요 */
   isUploadingChunks: boolean;
   /** 회의 소리를 함께 녹음하는지. 녹음을 비우면 `off`로 돌아가요 */
@@ -150,6 +151,7 @@ interface RecordingActions {
    * 끊겨서 쌓인 조각이 있으면 먼저 올릴 때까지 기다려요. 종료 뒤 수신 창은 120초뿐이라 그 안에 다 못 올릴 수 있어요
    */
   sealRecording: () => Promise<PcmAudioSeal>;
+  verifyDesktopChunks: () => Promise<PcmAudioSeal>;
   /** PCM 수집기만 닫고 마이크는 둬요. 서버가 조각 저장을 꺼 뒀을 때 받아 둔 마이크로 WebM 녹음을 시작하려고 써요 */
   closePcmCollector: () => void;
   /** 녹음을 버리고 마이크를 꺼요. PCM 큐는 `acceptUntil`을 주면 남겨 끝까지 올리고, 없으면 함께 비워요 */
@@ -172,6 +174,7 @@ const IDLE_STATE: RecordingState = {
   isMicrophoneLost: false,
   microphoneErrorName: null,
   isEnding: false,
+  desktopSaveFailed: false,
   isUploadingChunks: false,
   meetingAudioStatus: "off",
   isHeartbeatFailing: false,
@@ -454,6 +457,12 @@ export const useRecordingStore = create<RecordingState & RecordingActions>()((
           pendingDescriptors: [],
         }
       );
+    },
+
+    verifyDesktopChunks: async () => {
+      if (!chunkQueue) throw new Error("녹음 전송 큐가 없어요.");
+      await chunkQueue.verifyAll();
+      return chunkQueue.seal();
     },
 
     closePcmCollector: () => {
