@@ -32,10 +32,10 @@ KNOT_TEST_APP="$PWD/dist-desktop/Knot-darwin-$(node -p 'process.arch')/Knot.app"
 ## macOS 배포
 
 1. 저장소 Actions 변수 `KNOT_DESKTOP_URL`에 개인 Knot의 운영 웹 로그인 HTTPS 주소를 지정한다. 회원 API가 별도 origin이면 변수 `KNOT_DESKTOP_API_URL`에 해당 운영 HTTPS 주소도 지정한다. Actions secrets에 Developer ID Application 인증서와 개인 키를 내보낸 PKCS#12의 Base64(`MAC_CERT_P12`), 암호(`MAC_CERT_PASSWORD`), App Store Connect 팀 API 키 원문(`MAC_NOTARY_KEY_P8`), 키 ID(`MAC_NOTARY_KEY_ID`), 발급자 UUID(`MAC_NOTARY_ISSUER`)를 등록한다.
-2. 기본 브랜치에서 Actions → **macOS DMG** → **Run workflow**를 선택하고 새 버전(예: `1.0.0`)을 입력한다. 각 Mac 러너가 해당 CPU용 앱을 서명하고 DMG를 공증한다. Gatekeeper와 설치 경로를 확인하면 `mac-v<버전>` 초안 릴리스에 두 파일이 올라간다.
+2. 기본 브랜치에서 Actions → **macOS DMG** → **Run workflow**를 선택하고 변경 요약을 입력한다. 버전을 비우면 가장 높은 정식 `vX.Y.Z` 태그에서 minor를 올린다(예: `v0.7.0` → `v0.8.0`). 패치나 메이저 릴리스는 원하는 버전을 직접 입력한다. 각 Mac 러너가 해당 CPU용 앱을 서명하고 DMG를 공증한다. Gatekeeper와 설치 경로를 확인하면 `v<버전>` 초안 릴리스에 두 파일이 올라간다. 제목은 `[Release] v<버전> <변경 요약>`이며 본문에 해당 커밋 범위의 변경과 설치 방법, 두 파일의 SHA-256이 들어간다.
 3. Apple Silicon Mac과 Intel Mac 각각에서 저장소 계정으로 초안의 Assets를 브라우저로 다운로드한다.  → 이 Mac에 관하여의 칩이 Apple M 계열이면 `arm64`, Intel이면 `x64`를 고른다. `shasum -a 256 <다운로드한 DMG>` 결과를 기록한다. DMG를 열고 Knot을 Applications로 드래그한 뒤 디스크 이미지를 추출한다.
 4. 각 Mac에서 응용 프로그램의 Knot을 처음 실행하고 마이크를 허용한다. 한 문장을 녹음하고 ⌘Q에서 종료를 확인한다. 앱이 저장 후 종료되는지와 오프라인으로 다시 연 로컬 목록에서 마지막 발화까지 저장됐는지 확인한다. 두 결과를 해당 버전의 QA 기록에 남긴다.
-5. 두 실기기 QA가 통과하면 `frontend/`에서 아래 명령을 실행한다. 검증한 두 해시와 일치하는 초안을 공개하고, 공개 URL 두 개를 인증 없이 다시 내려받아 SHA-256을 대조한다. 공개 뒤 다운로드만 중단됐다면 같은 명령으로 다시 확인한다.
+5. 두 실기기 QA가 통과하면 Actions → **macOS 검증본 공개**에 버전과 두 SHA-256을 입력한다. 실행 요약에 기종별 직접 다운로드 링크가 표시된다. 로컬에서는 `frontend/`에서 아래 명령으로 같은 검증을 실행할 수 있다. 검증한 두 해시와 일치하는 초안을 공개하고, 공개 URL 두 개를 인증 없이 다시 내려받아 SHA-256을 대조한다. 공개 뒤 다운로드만 중단됐다면 같은 명령으로 다시 확인한다.
 
 ```sh
 bash electron/publish-dmg.sh <버전> <Apple-Silicon-QA-SHA256> <Intel-QA-SHA256>

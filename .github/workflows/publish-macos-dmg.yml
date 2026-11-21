@@ -1,0 +1,43 @@
+name: macOS 검증본 공개
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 검증한 초안 버전 X.Y.Z
+        required: true
+        type: string
+      arm64_sha256:
+        description: Apple Silicon 실기기 설치 QA를 통과한 DMG의 SHA-256
+        required: true
+        type: string
+      x64_sha256:
+        description: Intel 실기기 설치 QA를 통과한 DMG의 SHA-256
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    if: github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    concurrency: macos-release-${{ inputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: 두 검증본 공개 및 비로그인 다운로드 대조
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+          ARM: ${{ inputs.arm64_sha256 }}
+          INTEL: ${{ inputs.x64_sha256 }}
+        run: |
+          bash frontend/electron/publish-dmg.sh "$VERSION" "$ARM" "$INTEL"
+          base="https://github.com/$GITHUB_REPOSITORY/releases/download/v$VERSION"
+          {
+            echo "### Knot v$VERSION 다운로드"
+            echo "- [Apple Silicon]($base/Knot-$VERSION-arm64.dmg)"
+            echo "- [Intel]($base/Knot-$VERSION-x64.dmg)"
+          } >> "$GITHUB_STEP_SUMMARY"
