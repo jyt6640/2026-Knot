@@ -66,7 +66,9 @@ public class RecordingAudioFinalizationQuery {
                 job.getFailureCode(),
                 !"DISCARDED".equals(status) && job.canRetry(),
                 job.getId(),
-                job.getQuality()
+                job.getQuality(),
+                state.uploadRecoverySupported(),
+                state.expectedTotalFrameCount()
         );
     }
 

@@ -3,6 +3,7 @@ package com.knot.backend.recording.application;
 import com.knot.backend.recording.domain.model.RecordingAudioSealKind;
 
 import com.knot.backend.recording.application.dto.command.RecordingAudioChunkCommand;
+import com.knot.backend.recording.application.dto.command.AudioChunkAuthority;
 import com.knot.backend.recording.application.dto.command.RecordingControlCommand;
 import com.knot.backend.recording.application.dto.result.AudioFrameRange;
 import com.knot.backend.recording.application.dto.result.PresignedAudioChunk;
@@ -74,15 +75,10 @@ public class RecordingAudioChunkTransaction {
             );
         }
         validateWritable(controlled);
-        if (controlled.expired()) {
-            throw new RecordingAudioCaptureExpiredException();
-        }
-        if (controlled.stream()
-                .isSealed()) {
-            throw new RecordingException(RecordingErrorCode.RECORDING_ALREADY_ENDED);
-        }
-        controlled.stream()
-                .reserve(command.descriptor());
+        reserveDescriptor(
+                controlled,
+                command
+        );
         RecordingAudioChunk chunk = RecordingAudioChunk.reserve(
                 recordingId,
                 command.descriptor(),
@@ -95,6 +91,26 @@ public class RecordingAudioChunkTransaction {
                 true,
                 null
         );
+    }
+
+    private void reserveDescriptor(
+            ControlledAudio controlled,
+            RecordingAudioChunkCommand command
+    ) {
+        if (controlled.recovery()) {
+            controlled.stream()
+                    .reserveRecovery(command.descriptor());
+            return;
+        }
+        if (controlled.expired()) {
+            throw new RecordingAudioCaptureExpiredException();
+        }
+        if (controlled.stream()
+                .isSealed()) {
+            throw new RecordingException(RecordingErrorCode.RECORDING_ALREADY_ENDED);
+        }
+        controlled.stream()
+                .reserve(command.descriptor());
     }
 
     private RecordingAudioChunkReservation reserveExisting(
@@ -124,8 +140,7 @@ public class RecordingAudioChunkTransaction {
                 chunk,
                 command
         );
-        Instant cappedExpiry = controlled.stream()
-                .capUploadExpiry(expiresAt);
+        Instant cappedExpiry = controlled.capExpiry(expiresAt);
         chunk.extendUploadUrlExpiry(cappedExpiry);
         chunks.save(chunk);
         return reservation(
@@ -168,8 +183,7 @@ public class RecordingAudioChunkTransaction {
             );
         }
         validateWritable(controlled);
-        Instant maximumExpiry = controlled.stream()
-                .capUploadExpiry(chunk.getUploadUrlExpiresAt());
+        Instant maximumExpiry = controlled.capExpiry(chunk.getUploadUrlExpiresAt());
         if (signed.expiresAt() == null || signed.expiresAt()
                 .isAfter(maximumExpiry)
                 || !signed.expiresAt()
@@ -192,7 +206,7 @@ public class RecordingAudioChunkTransaction {
             long memberId,
             long recordingId,
             int sequence,
-            RecordingControlCommand command
+            AudioChunkAuthority command
     ) {
         ControlledAudio controlled = loadControlled(
                 workspaceId,
@@ -224,7 +238,7 @@ public class RecordingAudioChunkTransaction {
             long memberId,
             long recordingId,
             int sequence,
-            RecordingControlCommand command,
+            AudioChunkAuthority command,
             StoredAudioChunk stored
     ) {
         ControlledAudio controlled = loadControlled(
@@ -301,13 +315,26 @@ public class RecordingAudioChunkTransaction {
             long workspaceId,
             long memberId,
             long recordingId,
-            RecordingControlCommand command
+            AudioChunkAuthority command
     ) {
+        if (command instanceof AudioChunkAuthority.Recovery) {
+            RecordingAudioStream stream = recoveryStream(
+                    workspaceId,
+                    memberId,
+                    recordingId
+            );
+            stream.validateRecoveryDeclared();
+            return new ControlledAudio(
+                    stream,
+                    false,
+                    true
+            );
+        }
         RecordingSession session = recordingAccess.loadControlledForUpdate(
                 workspaceId,
                 memberId,
                 recordingId,
-                command
+                (RecordingControlCommand) command
         );
         validateMode(session);
         if (session.getStatus() == RecordingStatus.DISCARDED) {
@@ -325,26 +352,87 @@ public class RecordingAudioChunkTransaction {
                 connectionPolicy
         );
         if (session.getStatus() == RecordingStatus.ENDED) {
-            RecordingAudioSealKind kind = switch (session.getEndReason()) {
-                case CONNECTION_EXPIRED -> RecordingAudioSealKind.TIMEOUT;
-                case MAX_DURATION -> RecordingAudioSealKind.LIMIT;
-                case USER_ENDED -> RecordingAudioSealKind.REMOTE;
-            };
-            stream.seal(
-                    kind,
-                    session.getEndedAt()
+            sealEnded(
+                    session,
+                    stream
             );
             streams.save(stream);
         }
         sessions.save(session);
         return new ControlledAudio(
-                session,
                 stream,
-                expired
+                expired,
+                false
         );
     }
 
+    private void sealEnded(
+            RecordingSession session,
+            RecordingAudioStream stream
+    ) {
+        RecordingAudioSealKind kind = switch (session.getEndReason()) {
+            case CONNECTION_EXPIRED -> RecordingAudioSealKind.TIMEOUT;
+            case MAX_DURATION -> RecordingAudioSealKind.LIMIT;
+            case USER_ENDED -> RecordingAudioSealKind.REMOTE;
+        };
+        stream.seal(
+                kind,
+                session.getEndedAt()
+        );
+    }
+
+    @Transactional
+    public void declareRecoveryEnd(
+            long workspaceId,
+            long memberId,
+            long recordingId,
+            int lastSequence,
+            long totalFrames
+    ) {
+        recoveryStream(
+                workspaceId,
+                memberId,
+                recordingId
+        ).declareRecoveryEnd(
+                lastSequence,
+                totalFrames
+        );
+    }
+
+    private RecordingAudioStream recoveryStream(
+            long workspaceId,
+            long memberId,
+            long recordingId
+    ) {
+        RecordingSession session = recordingAccess.loadOwnedForUpdate(
+                workspaceId,
+                memberId,
+                recordingId
+        );
+        validateMode(session);
+        session.validateNotDiscarded();
+        session.expireIfDue(
+                now(),
+                connectionPolicy
+        );
+        if (session.getStatus() != RecordingStatus.ENDED) {
+            throw new RecordingException(RecordingErrorCode.AUDIO_SEAL_CONFLICT);
+        }
+        RecordingAudioStream stream = streams.findByRecordingIdForUpdate(recordingId)
+                .orElseThrow(() -> new RecordingException(RecordingErrorCode.RECORDING_NOT_FOUND));
+        sealEnded(
+                session,
+                stream
+        );
+        return stream;
+    }
+
     private void validateWritable(ControlledAudio controlled) {
+        if (controlled.recovery()) {
+            controlled.stream()
+                    .validateNotFrozen();
+            return;
+        }
         if (controlled.expired() && !now().isBefore(
                 controlled.stream()
                         .getAcceptUntil()
@@ -474,11 +562,16 @@ public class RecordingAudioChunkTransaction {
                 null,
                 false,
                 null,
-                null
+                null,
+                stream.isUploadRecoverySupported(),
+                stream.getRecoveryTotalFrames()
         );
     }
 
     private Integer expectedLastSequence(RecordingAudioStream stream) {
+        if (stream.isUploadRecoverySupported()) {
+            return stream.getRecoveryLastSequence();
+        }
         if (stream.isSealed()) {
             return stream.getLastSequence();
         }
@@ -553,10 +646,16 @@ public class RecordingAudioChunkTransaction {
     }
 
     private record ControlledAudio(
-            RecordingSession session,
             RecordingAudioStream stream,
-            boolean expired
+            boolean expired,
+            boolean recovery
     ) {
+        Instant capExpiry(Instant requested) {
+            if (recovery) {
+                return requested;
+            }
+            return stream.capUploadExpiry(requested);
+        }
     }
 
     private record Progress(

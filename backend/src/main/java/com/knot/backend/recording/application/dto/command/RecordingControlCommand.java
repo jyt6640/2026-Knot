@@ -5,7 +5,7 @@ import java.util.UUID;
 public record RecordingControlCommand(
         UUID tabId,
         String controlToken
-) {
+) implements AudioChunkAuthority {
 
     @Override
     public String toString() {
