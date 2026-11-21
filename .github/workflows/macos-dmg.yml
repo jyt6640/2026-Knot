@@ -3,6 +3,9 @@ on:
   pull_request:
     paths:
       - frontend/electron/**
+      - frontend/src/pages/desktop/**
+      - frontend/src/shared/store/recordingStore/**
+      - frontend/src/modules/widgets/recording/**
       - frontend/package.json
       - frontend/pnpm-lock.yaml
       - .github/workflows/macos-dmg.yml
@@ -73,11 +76,13 @@ jobs:
           xcrun notarytool store-credentials "$KNOT_NOTARY_PROFILE" --key "$key" --key-id "$KEY_ID" --issuer "$ISSUER"
       - name: DMG 생성 및 설치 검증
         env:
+          RELEASE_API_URL: ${{ vars.KNOT_DESKTOP_API_URL }}
           RELEASE_URL: ${{ vars.KNOT_DESKTOP_URL }}
         run: |
           [[ $(node -p 'process.arch') == "$KNOT_MAC_ARCH" ]]
           if [[ "$KNOT_MAC_RELEASE" == 1 ]]; then
             export KNOT_DESKTOP_URL="${RELEASE_URL:?운영 Knot HTTPS 주소를 지정하세요}"
+            export KNOT_DESKTOP_API_URL="$RELEASE_API_URL"
             suffix=""
           else
             export KNOT_DESKTOP_URL=https://localhost:3182

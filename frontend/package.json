@@ -22,8 +22,9 @@
     "test:qa": "node --test scripts/qa-link.test.mjs",
     "test:release-note": "node --test scripts/release-note.test.mjs",
     "qa:link": "node scripts/qa-link.mjs",
-    "desktop": "electron electron/main.cjs",
-    "package:mac": "node electron/package-mac.mjs",
+    "build:desktop": "webpack --config electron/desktop-webpack.mjs --mode production",
+    "desktop": "pnpm build:desktop && electron electron/main.cjs",
+    "package:mac": "pnpm build:desktop && node electron/package-mac.mjs",
     "test:desktop": "playwright test --config electron/playwright.config.mjs"
   },
   "devDependencies": {

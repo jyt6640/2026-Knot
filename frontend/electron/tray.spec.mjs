@@ -90,11 +90,7 @@ test("[MAC-R03] 메뉴 막대와 본창이 마이크 하나로 일시정지·재
   expect(
     await desktop.evaluate(({ BrowserWindow }) =>
       BrowserWindow.getAllWindows()
-        .find(
-          (w) =>
-            w.webContents.getURL().startsWith("https:") ||
-            w.webContents.getURL().startsWith("http:"),
-        )
+        .find((w) => w.webContents.getURL().startsWith("knot://app/"))
         .isVisible(),
     ),
   ).toBe(false);
@@ -149,17 +145,9 @@ test("[MAC-R03] 메뉴 막대와 본창이 마이크 하나로 일시정지·재
     .poll(() => desktop.evaluate(() => globalThis.testTray.isDestroyed()))
     .toBe(true);
 
-  expect(starts).toHaveLength(1);
-  expect(ends).toHaveLength(1);
-  const documentsPath = ends[0]
-    .replace("/api/v1/workspaces/", "/workspace/")
-    .replace(/\/end$/, "");
-  await expect(home).toHaveURL(
-    (url) =>
-      url.pathname === documentsPath ||
-      url.pathname === documentsPath + "/document",
-  );
-  expect(saved.length).toBeGreaterThan(0);
-  expect(new Set(saved).size).toBe(saved.length);
+  expect(starts).toHaveLength(0);
+  expect(ends).toHaveLength(0);
+  expect(saved).toHaveLength(0);
+  await expect(home.getByRole("button", { name: "원음 재생" })).toHaveCount(1);
   expect(await home.evaluate(() => window.micOpens)).toBe(1);
 });

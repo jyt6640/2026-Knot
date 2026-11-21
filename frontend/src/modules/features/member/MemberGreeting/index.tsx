@@ -8,7 +8,11 @@ import styled from "@emotion/styled";
 export default function MemberGreeting() {
   const { data: me } = useMeQuery();
 
-  return <Greeting>반가워요{me && `, ${me.nickname} 님`}</Greeting>;
+  return <GreetingTitle nickname={me?.nickname} />;
+}
+
+export function GreetingTitle({ nickname }: { nickname?: string }) {
+  return <Greeting>반가워요{nickname && `, ${nickname} 님`}</Greeting>;
 }
 
 const Greeting = styled.h1`

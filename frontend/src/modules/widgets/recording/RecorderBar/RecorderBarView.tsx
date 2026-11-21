@@ -1,0 +1,217 @@
+import { MEDIA_QUERY } from "@constants/breakpoint";
+import styled from "@emotion/styled";
+import Button from "@primitives/ui/Button";
+
+import PauseIcon from "@/assets/icons/pause.svg";
+import PlayIcon from "@/assets/icons/play.svg";
+
+import type { useRecorderBar } from "./model/useRecorderBar";
+import Waveform from "./ui/Waveform";
+
+export default function RecorderBarView(
+  props: Omit<
+    ReturnType<typeof useRecorderBar>,
+    "handlePause" | "handleEnd"
+  > & { handlePause: () => void; handleEnd: () => void },
+) {
+  const {
+    isPaused,
+    isReloaded,
+    isReloadedWhilePaused,
+    elapsedTime,
+    analyser,
+    isEnding,
+    desktopSaveFailed,
+    handlePause,
+    handleResume,
+    handleEnd,
+  } = props;
+
+  const getStatusLabel = () => {
+    if (desktopSaveFailed) return "저장 실패";
+    if (isEnding && window.knotDesktop) return "저장 중";
+    if (isReloaded && !isReloadedWhilePaused) return "녹음 멈춤";
+
+    return isPaused ? "일시정지" : "녹음 중";
+  };
+
+  return (
+    <Container aria-label="녹음 조작">
+      <Info>
+        <Status $isPaused={isPaused}>
+          <RecDot aria-hidden="true" $isPaused={isPaused} />
+          {getStatusLabel()}
+        </Status>
+
+        <ElapsedTime aria-label="녹음한 시간">{elapsedTime}</ElapsedTime>
+
+        {isReloaded ? (
+          <ReloadedNotice>
+            새로고침으로 녹음이 멈췄어요. 이어서 녹음을 눌러 주세요
+          </ReloadedNotice>
+        ) : (
+          <Waveform analyser={analyser} isActive={!isPaused} />
+        )}
+      </Info>
+
+      <Controls>
+        {isPaused ? (
+          <ControlButton
+            size="md"
+            variant="outline"
+            disabled={isEnding}
+            onClick={handleResume}
+          >
+            <IconBox>
+              <PlayIcon size={14} />
+            </IconBox>
+            이어서 녹음
+          </ControlButton>
+        ) : (
+          <ControlButton
+            size="md"
+            variant="outline"
+            disabled={isEnding}
+            onClick={handlePause}
+          >
+            <IconBox>
+              <PauseIcon size={14} />
+            </IconBox>
+            일시정지
+          </ControlButton>
+        )}
+
+        <Button
+          size="md"
+          variant="filled"
+          disabled={isEnding && !desktopSaveFailed}
+          onClick={handleEnd}
+        >
+          <IconBox>
+            <StopMark />
+          </IconBox>
+          {desktopSaveFailed ? "저장 다시 시도" : "녹음 끝내기"}
+        </Button>
+      </Controls>
+    </Container>
+  );
+}
+
+const Container = styled.section`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem; /* 16px */
+  width: 100%;
+  padding: 1rem 1.5rem; /* 16px 24px */
+  border: 1px solid ${({ theme }) => theme.neutral[200]};
+  border-radius: 1rem; /* 16px */
+  background-color: ${({ theme }) => theme.neutral[50]};
+
+  /* 모바일은 두 줄로 나눠요. 위는 상태, 시간, 파형, 아래는 두 버튼이에요(RESP-R10) */
+  ${MEDIA_QUERY.mobile} {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1rem; /* 16px */
+  }
+`;
+
+/** 상태·시간 다음의 남은 폭을 파형이 다 채워요 */
+const Info = styled.div`
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 1rem; /* 16px */
+  min-width: 0;
+  overflow: hidden; /* 좁아지면 파형 끝부터 잘려요 */
+`;
+
+/** 시간이 자라도 옆 글자가 밀리지 않게 상태 칸은 폭을 고정해요. */
+const Status = styled.p<{ $isPaused: boolean }>`
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.5rem; /* 8px */
+  width: 6rem; /* 96px */
+  color: ${({ theme, $isPaused }) =>
+    $isPaused ? theme.neutral[500] : theme.sub.warning[600]};
+  white-space: nowrap;
+  ${({ theme }) => theme.text.label01};
+`;
+
+/** 상태 글자 앞의 점. 일시정지면 글자보다 한 단계 옅은 회색이에요. */
+const RecDot = styled.span<{ $isPaused: boolean }>`
+  flex-shrink: 0;
+  width: 0.625rem; /* 10px */
+  height: 0.625rem;
+  border-radius: 50%;
+  background-color: ${({ theme, $isPaused }) =>
+    $isPaused ? theme.neutral[400] : theme.sub.warning[600]};
+`;
+
+const ElapsedTime = styled.p`
+  flex-shrink: 0;
+  color: ${({ theme }) => theme.neutral[900]};
+  font-variant-numeric: tabular-nums; /* 숫자가 바뀌어도 폭이 흔들리지 않아요 */
+  white-space: nowrap;
+  ${({ theme }) => theme.text.title02};
+
+  ${MEDIA_QUERY.mobile} {
+    ${({ theme }) => theme.text.heading02};
+  }
+`;
+
+/** 파형 자리에 놓이는 안내. 좁아지면 파형처럼 끝부터 잘려요 */
+const ReloadedNotice = styled.p`
+  overflow: hidden;
+  color: ${({ theme }) => theme.neutral[500]};
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  ${({ theme }) => theme.text.caption02};
+
+  ${MEDIA_QUERY.mobile} {
+    white-space: normal;
+  }
+`;
+
+const Controls = styled.div`
+  display: flex;
+  flex-shrink: 0;
+  gap: 0.5rem; /* 8px */
+
+  /* 모바일은 두 버튼이 폭을 반씩 나눠 채우고 높이 48px이에요 */
+  ${MEDIA_QUERY.mobile} {
+    && > button {
+      flex: 1;
+      height: 3rem; /* 48px */
+    }
+  }
+`;
+
+/** Figma의 버튼 글자는 Neutral/800이라 outline 기본색(700)보다 한 단계 짙게 둬요. */
+const ControlButton = styled(Button)`
+  color: ${({ theme }) => theme.neutral[800]};
+`;
+
+/**
+ * 버튼 안 아이콘 자리.
+ *
+ * `Button`은 바로 아래 svg를 18px로 맞추는데, Figma의 일시정지·재생 아이콘은 14px이라
+ * 18px 칸 가운데에 원래 크기로 놓아요.
+ */
+const IconBox = styled.span`
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 1.125rem; /* 18px */
+  height: 1.125rem;
+`;
+
+/** 녹음 끝내기(■). 모서리가 둥근 11px 사각형이에요. */
+const StopMark = styled.span`
+  width: 0.6875rem; /* 11px */
+  height: 0.6875rem;
+  border-radius: 0.15625rem; /* 2.5px */
+  background-color: currentColor;
+`;

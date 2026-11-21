@@ -1,5 +1,5 @@
 import { packager } from "@electron/packager";
-import { copyFile, mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { copyFile, cp, mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
@@ -35,8 +35,20 @@ const work = await mkdtemp(path.join(tmpdir(), "knot-mac-"));
 const dir = path.join(work, "app");
 try {
   await mkdir(dir);
-  for (const file of ["main.cjs", "preload.cjs", "recording-tray.cjs"])
+  for (const file of [
+    "main.cjs",
+    "preload.cjs",
+    "recording-tray.cjs",
+    "local-desktop.cjs",
+    "local-library.cjs",
+  ])
     await copyFile(new URL(file, import.meta.url), path.join(dir, file));
+  const api = new URL(process.env.KNOT_DESKTOP_API_URL || entry.origin);
+  if (api.protocol !== "https:" || api.username || api.password)
+    throw Error("HTTPS API 주소가 필요합니다.");
+  await cp("dist-desktop/renderer", path.join(dir, "renderer"), {
+    recursive: true,
+  });
   await writeFile(
     path.join(dir, "package.json"),
     JSON.stringify({
@@ -44,6 +56,7 @@ try {
       version,
       main: "main.cjs",
       knotDesktopUrl: entry.href,
+      knotApiUrl: api.origin,
     }),
   );
   const [output] = await packager({
