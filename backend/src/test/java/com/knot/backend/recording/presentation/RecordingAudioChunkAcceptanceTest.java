@@ -15,6 +15,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.knot.backend.auth.domain.AuthTokenProvider;
 import com.knot.backend.auth.domain.model.AuthenticatedMember;
 import com.knot.backend.recording.application.RecordingAudioChunkStorage;
+import com.knot.backend.recording.application.RecordingAudioFinalStorage;
+import com.knot.backend.recording.application.RecordingAudioFinalizationWorker;
+import com.knot.backend.recording.application.RecordingAudioFinalizationTransaction;
+import com.knot.backend.recording.domain.repository.RecordingAudioFinalizationRepository;
+import com.knot.backend.recording.domain.model.AudioManifestPart;
+import com.knot.backend.recording.infrastructure.audio.PcmWavAssembler;
 import com.knot.backend.recording.application.dto.result.PresignedAudioChunk;
 import com.knot.backend.recording.domain.model.StoredAudioChunk;
 import java.util.Map;
@@ -27,6 +33,16 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.io.ByteArrayInputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -482,6 +498,294 @@ class RecordingAudioChunkAcceptanceTest {
                 );
     }
 
+    @Test
+    @DisplayName("오래 단절된 소유자가 기존 객체와 미예약 꼬리를 복구하고 같은 WAV와 전사 등록을 조회한다")
+    void recover_success_afterCutoffWithLostResponse(
+            @Autowired RecordingAudioFinalizationTransaction finalization,
+            @Autowired RecordingAudioFinalizationRepository jobs
+    ) throws Exception {
+        Fixture fixture = startedRecording(true);
+        byte[] first = {1, 0};
+        byte[] last = {2, 0};
+        String firstBody = descriptor(
+                1,
+                0,
+                first
+        );
+        String lastBody = descriptor(
+                2,
+                1,
+                last
+        );
+        reserve(
+                fixture,
+                firstBody.replace(
+                        "{",
+                        "{\"tabId\":\"" + TAB_ID + "\",\"controlToken\":\"" + CONTROL_TOKEN + "\","
+                )
+        ).andExpect(status().isCreated());
+        disconnect(fixture);
+        String root = RECORDING_PATH + "/audio-recovery";
+        String end = "{\"lastSequence\":2,\"totalFrameCount\":2}";
+        mockMvc.perform(
+                writeRequest(
+                        root,
+                        fixture
+                ).content(end)
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.expectedLastSequence").value(2))
+                .andExpect(jsonPath("$.expectedTotalFrameCount").value(2))
+                .andExpect(jsonPath("$.tailUnknown").value(false));
+        assertThat(jobs.findUnregisteredSealedRecordingIds(20)).doesNotContain(fixture.recordingId());
+        mockMvc.perform(
+                writeRequest(
+                        root + "/chunks",
+                        fixture
+                ).content(lastBody)
+        )
+                .andExpect(status().isCreated());
+        when(storage.findStoredObject(anyString())).thenReturn(storedPart(first));
+        mockMvc.perform(
+                writeRequest(
+                        root + "/chunks",
+                        fixture
+                ).content(firstBody)
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("VERIFIED"))
+                .andExpect(jsonPath("$.uploadUrl").doesNotExist());
+        assertThat(jobs.findUnregisteredSealedRecordingIds(20)).doesNotContain(fixture.recordingId());
+
+        when(storage.findStoredObject(anyString())).thenReturn(storedPart(last));
+        confirmLastChunkConcurrently(fixture);
+        assertThat(jobs.findUnregisteredSealedRecordingIds(20)).contains(fixture.recordingId());
+        finalization.register(fixture.recordingId());
+        assembleAndCheckRecoveredWav(
+                fixture,
+                finalization,
+                jobs,
+                first,
+                last
+        );
+        assertThat(finalization.claim(fixture.recordingId())).isEmpty();
+        mockMvc.perform(
+                writeRequest(
+                        root,
+                        fixture
+                ).content(end)
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.audioSaveStatus").value("READY"))
+                .andExpect(jsonPath("$.quality").value("COMPLETE"));
+        assertThat(
+                jdbcClient.sql("SELECT count(*) FROM recording_transcriptions WHERE recording_session_id=:id")
+                        .param(
+                                "id",
+                                fixture.recordingId()
+                        )
+                        .query(Long.class)
+                        .single()
+        ).isOne();
+    }
+
+    private void confirmLastChunkConcurrently(Fixture fixture) throws Exception {
+        var start = new CountDownLatch(1);
+        Callable<Integer> complete = () -> {
+            start.await();
+            return mockMvc.perform(
+                    writeRequest(
+                            RECORDING_PATH + "/audio-recovery/chunks/{sequence}/complete",
+                            fixture,
+                            2
+                    )
+            )
+                    .andExpect(jsonPath("$.verifiedThroughFrame").value(2))
+                    .andReturn()
+                    .getResponse()
+                    .getStatus();
+        };
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            var first = executor.submit(complete);
+            var second = executor.submit(complete);
+            start.countDown();
+            assertThat(
+                    first.get(
+                            15,
+                            TimeUnit.SECONDS
+                    )
+            ).isEqualTo(200);
+            assertThat(
+                    second.get(
+                            15,
+                            TimeUnit.SECONDS
+                    )
+            ).isEqualTo(200);
+        }
+    }
+
+    private void assembleAndCheckRecoveredWav(
+            Fixture fixture,
+            RecordingAudioFinalizationTransaction finalization,
+            RecordingAudioFinalizationRepository jobs,
+            byte[] first,
+            byte[] last
+    ) {
+        RecordingAudioFinalStorage finalStorage = org.mockito.Mockito.mock(RecordingAudioFinalStorage.class);
+        when(finalStorage.findStoredFinal(anyString())).thenReturn(StoredAudioChunk.missing());
+        when(finalStorage.openChunk(any())).thenAnswer(call -> {
+            AudioManifestPart part = call.getArgument(0);
+            if (part.sequence() == 1) {
+                return new ByteArrayInputStream(first);
+            }
+            return new ByteArrayInputStream(last);
+        });
+        when(
+                finalStorage.uploadFinal(
+                        anyString(),
+                        any(),
+                        anyLong(),
+                        anyString()
+                )
+        ).thenAnswer(call -> {
+            Path file = call.getArgument(1);
+            byte[] wav = Files.readAllBytes(file);
+            assertThat(wav).hasSize(48);
+            assertThat(
+                    Arrays.copyOfRange(
+                            wav,
+                            44,
+                            48
+                    )
+            ).containsExactly(
+                    1,
+                    0,
+                    2,
+                    0
+            );
+            return new StoredAudioChunk(
+                    true,
+                    wav.length,
+                    "audio/wav",
+                    call.getArgument(3),
+                    "wav-v1"
+            );
+        });
+        RecordingAudioFinalizationWorker worker = new RecordingAudioFinalizationWorker(
+                finalization,
+                jobs,
+                storage,
+                finalStorage,
+                new PcmWavAssembler(finalStorage),
+                clock
+        );
+        try {
+            worker.process(
+                    finalization.claim(fixture.recordingId())
+                            .orElseThrow()
+            );
+        } finally {
+            worker.close();
+        }
+    }
+
+    @Test
+    @DisplayName("다른 멤버의 복구 요청은 선언·예약·확정 전에 거절한다")
+    void recover_failure_otherWorkspaceMember() throws Exception {
+        Fixture owner = startedRecording(true);
+        disconnect(owner);
+        long otherId = saveMember("other");
+        saveWorkspaceMember(
+                owner.workspaceId(),
+                otherId
+        );
+        Fixture other = new Fixture(
+                owner.workspaceId(),
+                otherId,
+                owner.recordingId()
+        );
+        String root = RECORDING_PATH + "/audio-recovery";
+        mockMvc.perform(
+                writeRequest(
+                        root,
+                        other
+                ).content("{\"lastSequence\":1,\"totalFrameCount\":1}")
+        )
+                .andExpect(status().isForbidden());
+        mockMvc.perform(
+                writeRequest(
+                        root + "/chunks",
+                        other
+                ).content(
+                        descriptor(
+                                1,
+                                0,
+                                new byte[]{1, 0}
+                        )
+                )
+        )
+                .andExpect(status().isForbidden());
+        mockMvc.perform(
+                writeRequest(
+                        root + "/chunks/{sequence}/complete",
+                        other,
+                        1
+                )
+        )
+                .andExpect(status().isForbidden());
+        readState(other).andExpect(status().isForbidden());
+        verifyNoInteractions(storage);
+    }
+
+    private void disconnect(Fixture fixture) {
+        jdbcClient.sql("""
+                UPDATE recording_sessions SET started_at = started_at - INTERVAL '2 hours',
+                    current_interval_started_at = current_interval_started_at - INTERVAL '2 hours',
+                    last_seen_at = last_seen_at - INTERVAL '2 hours' WHERE id=:id
+                """)
+                .param(
+                        "id",
+                        fixture.recordingId()
+                )
+                .update();
+    }
+
+    private StoredAudioChunk storedPart(byte[] bytes) throws Exception {
+        String hash = java.util.Base64.getEncoder()
+                .encodeToString(
+                        MessageDigest.getInstance("SHA-256")
+                                .digest(bytes)
+                );
+        return new StoredAudioChunk(
+                true,
+                bytes.length,
+                "application/octet-stream",
+                hash,
+                "v1"
+        );
+    }
+
+    private String descriptor(
+            int sequence,
+            long offset,
+            byte[] bytes
+    ) throws Exception {
+        return objectMapper.writeValueAsString(
+                Map.of(
+                        "sequence",
+                        sequence,
+                        "sampleOffset",
+                        offset,
+                        "frameCount",
+                        bytes.length / 2,
+                        "byteLength",
+                        bytes.length,
+                        "checksumSha256",
+                        storedPart(bytes).checksumSha256()
+                )
+        );
+    }
+
     private ResultActions reserve(
             Fixture fixture,
             String body
@@ -566,6 +870,10 @@ class RecordingAudioChunkAcceptanceTest {
     }
 
     private Fixture startedRecording() throws Exception {
+        return startedRecording(false);
+    }
+
+    private Fixture startedRecording(boolean recoverySupported) throws Exception {
         long memberId = saveMember("member");
         long workspaceId = saveWorkspace("팀");
         saveWorkspaceMember(
@@ -589,11 +897,12 @@ class RecordingAudioChunkAcceptanceTest {
                         .content(
                                 """
                                         {"requestId":"%s","tabId":"%s",
-                                         "controlToken":"%s","audioMode":"PCM16_CHUNKS_V1"}
+                                         "controlToken":"%s","audioMode":"PCM16_CHUNKS_V1","uploadRecoverySupported":%s}
                                         """.formatted(
                                         UUID.randomUUID(),
                                         TAB_ID,
-                                        CONTROL_TOKEN
+                                        CONTROL_TOKEN,
+                                        recoverySupported
                                 )
                         )
         )
