@@ -4,6 +4,7 @@ const {
   dialog,
   ipcMain,
   session,
+  screen,
   systemPreferences,
 } = require("electron");
 const path = require("node:path");
@@ -24,6 +25,8 @@ if (
   );
 }
 
+const { attachRecordingTray } = require("./recording-tray.cjs");
+let recordingTray;
 let mainWindow;
 let recording = null;
 let quitRequest = null;
@@ -63,8 +66,10 @@ ipcMain.on("recording:state", (event, state) => {
     state === null ||
     (Number.isSafeInteger(state?.id) &&
       ["active", "saving"].includes(state.phase))
-  )
+  ) {
     recording = state;
+    recordingTray?.update(state);
+  }
 });
 
 ipcMain.on("recording:finish-result", async (event, id, saved) => {
@@ -122,7 +127,22 @@ app.on("before-quit", async (event) => {
   mainWindow.webContents.send("recording:finish", id);
 });
 
+ipcMain.on("tray:ready", (event, id) => {
+  if (trusted(event)) recordingTray?.ready(id);
+});
+ipcMain.on("tray:return", (event, id) => {
+  if (trusted(event)) recordingTray?.returnToMain(id);
+});
+
 app.whenReady().then(() => {
+  // Local UI tests must choose a display before macOS shows the first window.
+  const testDisplay = () => {
+    if (!app.commandLine.hasSwitch("knot-test-internal-display")) return;
+    const display = screen.getAllDisplays().find((item) => item.internal);
+    if (!display) throw new Error("MacBook internal display unavailable");
+    return display;
+  };
+  const area = testDisplay()?.workArea;
   const trustedOrigin = (url) => {
     try {
       return new URL(url).origin === entry.origin;
@@ -149,8 +169,12 @@ app.whenReady().then(() => {
     },
   );
   mainWindow = new BrowserWindow({
-    width: 1440,
-    height: 940,
+    width: Math.min(1440, area?.width ?? 1440),
+    height: Math.min(940, area?.height ?? 940),
+    ...(area && {
+      x: area.x + Math.max(0, Math.floor((area.width - 1440) / 2)),
+      y: area.y + Math.max(0, Math.floor((area.height - 940) / 2)),
+    }),
     webPreferences: {
       preload: path.join(__dirname, "preload.cjs"),
       additionalArguments: ["--knot-origin=" + entry.origin],
@@ -160,7 +184,9 @@ app.whenReady().then(() => {
       backgroundThrottling: false,
     },
   });
-  mainWindow.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
+  if (process.platform === "darwin")
+    recordingTray = attachRecordingTray(mainWindow, showWindow, testDisplay);
+  else mainWindow.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
   mainWindow.webContents.on("will-navigate", (event, url) => {
     // Existing OAuth flows navigate to HTTPS identity providers. Only Knot gets the bridge.
     if (recording || (!trustedOrigin(url) && !url.startsWith("https://")))

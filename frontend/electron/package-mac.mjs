@@ -14,7 +14,7 @@ if (entry.protocol !== "https:" || entry.username || entry.password)
 
 const dir = await mkdtemp(path.join(tmpdir(), "knot-mac-"));
 try {
-  for (const file of ["main.cjs", "preload.cjs"])
+  for (const file of ["main.cjs", "preload.cjs", "recording-tray.cjs"])
     await copyFile(new URL(file, import.meta.url), path.join(dir, file));
   await writeFile(
     path.join(dir, "package.json"),
