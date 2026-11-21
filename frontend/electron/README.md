@@ -1,8 +1,8 @@
 # Knot Mac 본창
 
-프론트엔드 폴더에서 `pnpm install --frozen-lockfile`을 실행한다. 한 터미널에서 `API_MOCKING=true pnpm dev --no-open`으로 웹 앱을 띄우고, 다른 터미널에서 `pnpm desktop`으로 같은 앱을 연다. Electron은 첫 실행 때 해당 플랫폼의 바이너리를 내려받는다.
+프론트엔드 폴더에서 `pnpm install --frozen-lockfile` 후 `pnpm desktop`을 실행한다. 홈과 녹음 화면, 오디오 수집기는 앱에 포함된다. 첫 로그인과 로그아웃 후 재로그인에는 Knot 서버 연결이 필요하다. `KNOT_DESKTOP_URL`은 웹 로그인 주소이며 개발 기본값은 `http://localhost:3000`이다. 회원 확인 API가 별도 호스트에 있으면 `KNOT_DESKTOP_API_URL`도 설정한다.
 
-개발 기본 주소는 `http://localhost:3000`이다. 실제 서버를 사용할 때는 현재 React 번들이 배포된 개인 Knot의 HTTPS 주소를 `KNOT_DESKTOP_URL`로 지정한다. 로그인과 API 요청은 해당 웹 배포의 설정을 따른다.
+로그인 상태의 Mac은 오프라인으로 다시 열 수 있다. 원음은 Electron 사용자 데이터의 `recordings/<서버별 디렉터리>/<회원 ID>/<녹음 ID>.knot`에 저장한다. SQLite가 5초 단위로 암호화된 PCM을 커밋하고, 녹음을 끝낼 때 마지막 짧은 구간도 저장한다. 강제 종료 후에는 마지막 커밋까지 재생할 수 있다. 계정별 키는 macOS 키체인을 사용하는 Electron safeStorage로 보호한다. 로그아웃하면 원본을 잠그고, 같은 계정으로 다시 로그인하면 목록과 재생을 복원한다. ‘이 Mac에서 삭제’는 확인한 녹음 파일과 그 안의 메타데이터를 지운다.
 
 빨간 닫기 버튼은 창을 숨긴다. Dock에서 Knot을 선택하면 같은 창이 열린다. 녹음 중 ⌘Q를 누르면 계속 녹음하거나 오디오 저장 후 종료할 수 있다. 저장에 실패하면 같은 녹음으로 다시 시도한다.
 
@@ -10,7 +10,7 @@ macOS에서 `pnpm test:desktop`을 실행하면 별도 프로필, 테스트 마�
 
 ## 마이크 권한을 패키징한 앱에서 확인하기
 
-`KNOT_DESKTOP_URL=https://<개인-Knot-프론트-주소> pnpm package:mac`은 지정한 화면을 여는 로컬 QA용 `dist-desktop/Knot-darwin-<arch>/Knot.app`을 만든다. 이 주소는 빌드 시 앱에 기록된다. 앱의 번들 ID는 `com.jyt6640.knot`이다.
+`KNOT_DESKTOP_URL=https://<개인-Knot-프론트-주소> pnpm package:mac`은 로컬 화면과 지정한 로그인 주소를 포함한 로컬 QA용 `dist-desktop/Knot-darwin-<arch>/Knot.app`을 만든다. 이 주소는 빌드 시 앱에 기록된다. 앱의 번들 ID는 `com.jyt6640.knot`이다.
 
 자동 검증은 아래와 같이 실행한다. 테스트용 HTTPS 서버가 별도로 뜨고, 실제 앱에서 로컬 API와 가상 마이크를 사용한다. 테스트가 macOS 권한 응답을 제어한다.
 
@@ -31,10 +31,10 @@ KNOT_TEST_APP="$PWD/dist-desktop/Knot-darwin-$(node -p 'process.arch')/Knot.app"
 
 ## macOS 배포
 
-1. 저장소 Actions 변수 `KNOT_DESKTOP_URL`에 로그인과 녹음 저장이 가능한 개인 Knot 운영 HTTPS 주소를 지정한다. Actions secrets에 Developer ID Application 인증서와 개인 키를 내보낸 PKCS#12의 Base64(`MAC_CERT_P12`), 암호(`MAC_CERT_PASSWORD`), App Store Connect 팀 API 키 원문(`MAC_NOTARY_KEY_P8`), 키 ID(`MAC_NOTARY_KEY_ID`), 발급자 UUID(`MAC_NOTARY_ISSUER`)를 등록한다.
+1. 저장소 Actions 변수 `KNOT_DESKTOP_URL`에 개인 Knot의 운영 웹 로그인 HTTPS 주소를 지정한다. 회원 API가 별도 origin이면 변수 `KNOT_DESKTOP_API_URL`에 해당 운영 HTTPS 주소도 지정한다. Actions secrets에 Developer ID Application 인증서와 개인 키를 내보낸 PKCS#12의 Base64(`MAC_CERT_P12`), 암호(`MAC_CERT_PASSWORD`), App Store Connect 팀 API 키 원문(`MAC_NOTARY_KEY_P8`), 키 ID(`MAC_NOTARY_KEY_ID`), 발급자 UUID(`MAC_NOTARY_ISSUER`)를 등록한다.
 2. 기본 브랜치에서 Actions → **macOS DMG** → **Run workflow**를 선택하고 새 버전(예: `1.0.0`)을 입력한다. 각 Mac 러너가 해당 CPU용 앱을 서명하고 DMG를 공증한다. Gatekeeper와 설치 경로를 확인하면 `mac-v<버전>` 초안 릴리스에 두 파일이 올라간다.
 3. Apple Silicon Mac과 Intel Mac 각각에서 저장소 계정으로 초안의 Assets를 브라우저로 다운로드한다.  → 이 Mac에 관하여의 칩이 Apple M 계열이면 `arm64`, Intel이면 `x64`를 고른다. `shasum -a 256 <다운로드한 DMG>` 결과를 기록한다. DMG를 열고 Knot을 Applications로 드래그한 뒤 디스크 이미지를 추출한다.
-4. 각 Mac에서 응용 프로그램의 Knot을 처음 실행하고 마이크를 허용한다. 한 문장을 녹음하고 ⌘Q에서 종료를 확인한다. 앱이 저장 후 종료되는지와 같은 계정으로 다시 연 문서에서 마지막 발화까지 저장됐는지 확인한다. 두 결과를 해당 버전의 QA 기록에 남긴다.
+4. 각 Mac에서 응용 프로그램의 Knot을 처음 실행하고 마이크를 허용한다. 한 문장을 녹음하고 ⌘Q에서 종료를 확인한다. 앱이 저장 후 종료되는지와 오프라인으로 다시 연 로컬 목록에서 마지막 발화까지 저장됐는지 확인한다. 두 결과를 해당 버전의 QA 기록에 남긴다.
 5. 두 실기기 QA가 통과하면 `frontend/`에서 아래 명령을 실행한다. 검증한 두 해시와 일치하는 초안을 공개하고, 공개 URL 두 개를 인증 없이 다시 내려받아 SHA-256을 대조한다. 공개 뒤 다운로드만 중단됐다면 같은 명령으로 다시 확인한다.
 
 ```sh

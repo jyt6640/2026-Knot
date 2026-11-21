@@ -5,6 +5,7 @@ const {
   ipcMain,
   session,
   screen,
+  protocol,
   systemPreferences,
 } = require("electron");
 const path = require("node:path");
@@ -26,6 +27,24 @@ if (
 }
 
 const { attachRecordingTray } = require("./recording-tray.cjs");
+const { attachLocalDesktop, home, isHome } = require("./local-desktop.cjs");
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: "knot",
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      stream: true,
+      corsEnabled: true,
+    },
+  },
+]);
+if (!app.requestSingleInstanceLock()) app.exit();
+app.on("second-instance", () => {
+  if (mainWindow) showWindow();
+});
+let library;
 let recordingTray;
 let mainWindow;
 let recording = null;
@@ -45,7 +64,7 @@ function trusted(event) {
     mainWindow &&
     event.sender === mainWindow.webContents &&
     frame === event.sender.mainFrame &&
-    new URL(frame.url).origin === entry.origin
+    isHome(frame.url)
   );
 }
 
@@ -63,9 +82,9 @@ ipcMain.handle("microphone:request", async (event) => {
 ipcMain.on("recording:state", (event, state) => {
   if (!trusted(event)) return;
   if (
-    state === null ||
-    (Number.isSafeInteger(state?.id) &&
-      ["active", "saving"].includes(state.phase))
+    library?.active &&
+    state?.id === library.active.id &&
+    ["active", "saving"].includes(state.phase)
   ) {
     recording = state;
     recordingTray?.update(state);
@@ -143,13 +162,9 @@ app.whenReady().then(() => {
     return display;
   };
   const area = testDisplay()?.workArea;
-  const trustedOrigin = (url) => {
-    try {
-      return new URL(url).origin === entry.origin;
-    } catch {
-      return false;
-    }
-  };
+  const trustedOrigin = (url) =>
+    typeof url === "string" &&
+    (url === "knot://app" || url.startsWith("knot://app/"));
   session.defaultSession.setPermissionCheckHandler(
     (contents, permission, origin, details) =>
       contents === mainWindow?.webContents &&
@@ -177,7 +192,6 @@ app.whenReady().then(() => {
     }),
     webPreferences: {
       preload: path.join(__dirname, "preload.cjs"),
-      additionalArguments: ["--knot-origin=" + entry.origin],
       sandbox: true,
       contextIsolation: true,
       nodeIntegration: false,
@@ -187,11 +201,36 @@ app.whenReady().then(() => {
   if (process.platform === "darwin")
     recordingTray = attachRecordingTray(mainWindow, showWindow, testDisplay);
   else mainWindow.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
-  mainWindow.webContents.on("will-navigate", (event, url) => {
-    // Existing OAuth flows navigate to HTTPS identity providers. Only Knot gets the bridge.
-    if (recording || (!trustedOrigin(url) && !url.startsWith("https://")))
-      event.preventDefault();
-  });
+  mainWindow.webContents.on("will-navigate", (event) => event.preventDefault());
+  const api = new URL(
+    (app.isPackaged
+      ? require("./package.json").knotApiUrl
+      : process.env.KNOT_DESKTOP_API_URL) || entry.origin,
+  );
+  library = attachLocalDesktop(
+    mainWindow,
+    { entry, api },
+    app.getPath("userData"),
+    app.isPackaged
+      ? path.join(__dirname, "renderer")
+      : path.resolve(__dirname, "../dist-desktop/renderer"),
+    (id) => {
+      recording = {
+        id,
+        phase: "active",
+        elapsedTime: "00:00",
+        paused: false,
+        saveFailed: false,
+      };
+      recordingTray?.update(recording);
+    },
+    ({ interrupted }) => {
+      if (interrupted) quitRequest = null;
+      recording = null;
+      recordingTray?.update(null);
+    },
+  );
+
   mainWindow.on("close", (event) => {
     if (!quitting) {
       event.preventDefault();
@@ -199,5 +238,5 @@ app.whenReady().then(() => {
     }
   });
   app.on("activate", showWindow);
-  mainWindow.loadURL(entry.href);
+  mainWindow.loadURL(home);
 });

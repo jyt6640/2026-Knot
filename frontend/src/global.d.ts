@@ -50,6 +50,16 @@ declare function registerProcessor(
 
 interface Window {
   knotDesktop?: {
+    local?: {
+      account(): Promise<LocalAccount | null>;
+      login(): Promise<LocalAccount>;
+      logout(): Promise<void>;
+      list(): Promise<LocalAudio[]>;
+      remove(id: number): Promise<void>;
+      begin(): Promise<number>;
+      append(id: number, seq: number, bytes: Uint8Array): Promise<void>;
+      finish(id: number, count: number): Promise<void>;
+    };
     requestMicrophoneAccess?(): Promise<
       "granted" | "denied" | "restricted" | "unknown"
     >;
@@ -69,4 +79,16 @@ interface Window {
     ): void;
     onFinish(finish: (recordingId: number) => Promise<boolean>): () => void;
   };
+}
+
+interface LocalAccount {
+  memberId: number;
+  nickname: string;
+}
+interface LocalAudio {
+  id: number;
+  created: number;
+  bytes: number;
+  recovered: boolean;
+  src: string;
 }

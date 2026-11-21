@@ -1,10 +1,18 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
-const origin = process.argv
-  .find((arg) => arg.startsWith("--knot-origin="))
-  ?.slice(14);
-if (process.isMainFrame && location.origin === origin) {
+if (process.isMainFrame && location.href === "knot://app/index.html") {
   contextBridge.exposeInMainWorld("knotDesktop", {
+    local: {
+      account: () => ipcRenderer.invoke("local:account"),
+      login: () => ipcRenderer.invoke("local:login"),
+      logout: () => ipcRenderer.invoke("local:logout"),
+      list: () => ipcRenderer.invoke("local:list"),
+      remove: (id) => ipcRenderer.invoke("local:remove", id),
+      begin: () => ipcRenderer.invoke("local:begin"),
+      append: (id, seq, bytes) =>
+        ipcRenderer.invoke("local:append", id, seq, bytes),
+      finish: (id, count) => ipcRenderer.invoke("local:finish", id, count),
+    },
     ...(process.platform === "darwin" && {
       recordingMenu: {
         subscribe: (open, close) => {
