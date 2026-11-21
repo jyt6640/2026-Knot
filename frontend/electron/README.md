@@ -42,3 +42,5 @@ bash electron/publish-dmg.sh <버전> <Apple-Silicon-QA-SHA256> <Intel-QA-SHA256
 ```
 
 PR에서는 두 기종의 러너가 테스트용 HTTPS 주소로 임시 서명된 `-test.dmg`를 만들고 마운트한다. 격리된 Applications 폴더로 복사하고 이미지를 추출한 뒤 설치한 앱에서 녹음 E2E를 실행한다.
+
+Apple Developer 멤버십 없이 검증용 DMG를 배포할 때는 **macOS DMG**의 배포 유형에서 `preview`를 선택한다. 운영 로그인 주소는 동일하게 설정한다. 두 기종에서 DMG 복사, CPU·버전·ad-hoc 서명 확인, 새 프로필의 로그인 화면 실행을 검증하고 GitHub Releases 초안을 프리릴리스로 표시한다. 실기기 검증과 두 해시를 대조하는 공개 절차는 정식 배포와 같다. Preview 첫 실행은 Gatekeeper에서 차단될 수 있다.

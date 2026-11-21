@@ -268,7 +268,7 @@ const holdResponses = (action: keyof typeof HELD_RESPONSES) => {
     }),
   );
 
-  return { respond: () => waiting.shift()?.() };
+  return { pending: () => waiting.length, respond: () => waiting.shift()?.() };
 };
 
 /** 열어 준 응답이 큐까지 흘러갈 시간을 줘요 */
@@ -1177,7 +1177,7 @@ describe("useRecordingControl의 PCM 조각 녹음", () => {
     });
 
     it("저장이 확인되기 전까지 조각을 브라우저에 보관하고, 확인되면 지운다", async () => {
-      const { respond } = holdResponses("complete");
+      const { pending, respond } = holdResponses("complete");
       const result = renderRecordingControl();
       const collector = await startRecording(result);
 
@@ -1186,6 +1186,7 @@ describe("useRecordingControl의 PCM 조각 녹음", () => {
         expect(await readRecordingChunks(RECORDING_ID)).toHaveLength(1),
       );
 
+      await waitFor(() => expect(pending()).toBe(1));
       respond();
       await waitFor(async () =>
         expect(await readRecordingChunks(RECORDING_ID)).toEqual([]),

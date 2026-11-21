@@ -20,16 +20,16 @@ if (
   !/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(version)
 )
   throw new Error("지원하는 CPU와 숫자 세 자리 버전(예: 1.0.0)을 지정하세요.");
+const preview = process.env.KNOT_MAC_PREVIEW === "1";
 if (
-  release &&
-  (!process.env.KNOT_SIGN_IDENTITY ||
-    !process.env.KNOT_MAC_VERSION ||
+  (release || preview) &&
+  (!process.env.KNOT_MAC_VERSION ||
     !entry.hostname.includes(".") ||
     /^(127\.|0\.)|\.(localhost|local)$/.test(entry.hostname))
 )
-  throw new Error(
-    "공개 배포에는 Developer ID, 버전, 운영 HTTPS 주소가 필요합니다.",
-  );
+  throw new Error("배포에는 버전과 운영 HTTPS 주소가 필요합니다.");
+if (release && !process.env.KNOT_SIGN_IDENTITY)
+  throw new Error("정식 배포에는 Developer ID가 필요합니다.");
 
 const work = await mkdtemp(path.join(tmpdir(), "knot-mac-"));
 const dir = path.join(work, "app");
@@ -91,7 +91,7 @@ try {
     overwrite: true,
   });
   const bundle = path.join(output, "Knot.app");
-  // 로컬 권한 QA용 앱 서명. 공개 배포 서명과 공증은 릴리스에서 수행한다.
+  // 테스트와 Preview 앱은 ad-hoc 서명을 사용한다.
   if (!release)
     execFileSync("codesign", ["--force", "--deep", "--sign", "-", bundle]);
   console.log(bundle);

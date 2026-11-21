@@ -10,7 +10,7 @@ name="Knot-$version-$arch"
 if [[ $release == 1 ]]; then
   : "${KNOT_NOTARY_PROFILE:?missing notarytool profile}"
   codesign --verify --deep --strict -R='anchor apple generic and certificate leaf[field.1.2.840.113635.100.6.1.13] exists' "$bundle"
-else
+elif [[ ${KNOT_MAC_PREVIEW:-0} != 1 ]]; then
   name="$name-test"
 fi
 stage=$(mktemp -d)
