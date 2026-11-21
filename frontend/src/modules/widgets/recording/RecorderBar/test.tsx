@@ -259,6 +259,13 @@ describe("RecorderBar", () => {
     expect(getElapsedTime()).toHaveTextContent("00:10");
   });
 
+  it("Mac 저장 실패 상태에서는 녹음 재개 대신 저장 재시도를 제공한다", () => {
+    useRecordingStore.setState({ status: "paused", isEnding: true, desktopSaveFailed: true });
+    renderRecorderBar();
+    expect(screen.getByRole("button", { name: "저장 다시 시도" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "이어서 녹음" })).toBeDisabled();
+  });
+
   describe("녹음 끝내기", () => {
     it("누르면 확인 창을 띄우고 아직 끝내지 않는다", async () => {
       const count = countControlRequests();

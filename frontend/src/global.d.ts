@@ -47,3 +47,10 @@ declare function registerProcessor(
   name: string,
   processor: new () => AudioWorkletProcessor,
 ): void;
+
+interface Window {
+  knotDesktop?: {
+    setRecording(state: { id: number; phase: "active" | "saving" } | null): void;
+    onFinish(finish: (recordingId: number) => Promise<boolean>): () => void;
+  };
+}

@@ -21,7 +21,9 @@
     "build-storybook": "storybook build",
     "test:qa": "node --test scripts/qa-link.test.mjs",
     "test:release-note": "node --test scripts/release-note.test.mjs",
-    "qa:link": "node scripts/qa-link.mjs"
+    "qa:link": "node scripts/qa-link.mjs",
+    "desktop": "electron electron/main.cjs",
+    "test:desktop": "playwright test --config electron/playwright.config.mjs"
   },
   "devDependencies": {
     "@emotion/babel-plugin": "^11.13.5",
@@ -41,6 +43,7 @@
     "@types/react-dom": "^19.2.4",
     "copy-webpack-plugin": "^14.0.0",
     "css-loader": "^7.1.4",
+    "electron": "45.4.1",
     "fake-indexeddb": "^6.2.7",
     "html-webpack-plugin": "^5.6.8",
     "jsdom": "^30.0.1",
